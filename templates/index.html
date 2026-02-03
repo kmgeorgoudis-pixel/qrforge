@@ -14,12 +14,12 @@
 
         body {
             overflow-x: hidden;
-            background: #f0f2f5; /* Ανοιχτό γκρι-μπλε φόντο */
+            background: #f0f2f5; 
             color: #1e293b;
             font-family: 'Inter', sans-serif;
+            margin: 0;
         }
 
-        /* Πολύχρωμο Κινούμενο Background */
         #bg-canvas {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -31,17 +31,33 @@
             background: var(--glass);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 15px 40px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-sizing: border-box;
         }
 
-        .logo { color: #1e293b !important; }
-        .logo span { background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo { 
+            color: #1e293b !important; 
+            font-weight: 900; 
+            font-size: 1.5rem; 
+            text-decoration: none;
+        }
+        .logo span { 
+            background: var(--primary-grad); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
 
-        .hero { padding: 100px 20px 40px; }
+        .hero { padding: 140px 20px 40px; text-align: center; }
         .hero h1 {
             font-size: 4rem;
             color: #0f172a;
             font-weight: 900;
             line-height: 1.1;
+            margin: 0;
         }
 
         .gradient-text {
@@ -71,6 +87,7 @@
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .card:hover {
@@ -88,20 +105,70 @@
             filter: drop-shadow(0 10px 15px rgba(99, 102, 241, 0.3));
         }
 
-        .card h3 {
-            font-size: 2rem;
-            color: #1e293b;
-            font-weight: 800;
-            margin-bottom: 15px;
+        .card h3 { font-size: 2rem; color: #1e293b; font-weight: 800; margin-bottom: 15px; }
+        .card p { color: #64748b; font-size: 1.1rem; line-height: 1.6; }
+
+        /* --- New Partnership Section --- */
+        .partnership-container {
+            max-width: 1000px;
+            margin: 80px auto;
+            padding: 0 20px;
         }
 
-        .card p {
-            color: #64748b;
-            font-size: 1.1rem;
-            line-height: 1.6;
+        .partnership-card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 2px solid white;
+            border-radius: 40px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 40px;
         }
 
-        /* Floating Blobs Animation */
+        .partnership-badge {
+            position: absolute;
+            top: 20px;
+            right: -35px;
+            background: var(--primary-grad);
+            color: white;
+            padding: 8px 45px;
+            transform: rotate(45deg);
+            font-size: 0.7rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        .partnership-image { flex: 0 0 220px; }
+        .partnership-image img {
+            width: 100%;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: transform 0.4s;
+        }
+        .partnership-image img:hover { transform: rotate(-3deg) scale(1.05); }
+
+        .partnership-text { flex: 1; }
+        .partnership-text h2 { font-size: 1.8rem; color: #0f172a; margin-bottom: 15px; }
+        .partnership-text p { color: #475569; line-height: 1.6; margin-bottom: 20px; font-size: 1.05rem; }
+
+        .partnership-link-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+        .partnership-link-box a { text-decoration: none; color: #6366f1; font-weight: 800; font-size: 1.1rem; }
+        .partnership-link-box:hover { border-color: #6366f1; transform: translateX(5px); }
+
+        /* --- Footer & UI Elements --- */
         .blob {
             position: fixed;
             width: 500px; height: 500px;
@@ -113,31 +180,28 @@
             animation: move 20s infinite alternate;
         }
 
-        @keyframes move {
-            from { transform: translate(-10%, -10%); }
-            to { transform: translate(20%, 20%); }
-        }
+        @keyframes move { from { transform: translate(-10%, -10%); } to { transform: translate(20%, 20%); } }
 
         #cookie-banner {
-            background: white;
-            color: #1e293b;
-            border-radius: 20px 20px 0 0;
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: white; padding: 20px;
+            display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
-            border-top: none;
+            z-index: 2000; box-sizing: border-box;
         }
 
         .accept-btn {
             background: var(--primary-grad) !important;
             border-radius: 50px !important;
-            padding: 12px 30px !important;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            padding: 10px 25px !important;
+            color: white; border: none; font-weight: bold; cursor: pointer;
         }
 
-        footer {
-            background: white;
-            border-top: 1px solid rgba(0,0,0,0.05);
-            color: #64748b !important;
+        footer { text-align: center; padding: 60px 20px; background: white; border-top: 1px solid rgba(0,0,0,0.05); }
+
+        @media (max-width: 768px) {
+            .partnership-card { flex-direction: column; text-align: center; }
+            .hero h1 { font-size: 2.5rem; }
         }
     </style>
 </head>
@@ -147,7 +211,7 @@
     <canvas id="bg-canvas"></canvas>
 
     <nav>
-        <div class="logo">QR<span>FORGE</span></div>
+        <a href="/" class="logo">QR<span>FORGE</span></a>
     </nav>
 
     <header class="hero">
@@ -172,32 +236,48 @@
         </div>
     </main>
 
-    <footer style="text-align: center; padding: 60px 20px;">
+    <section class="partnership-container">
+        <div class="partnership-card">
+            <div class="partnership-badge">PREMIUM PARTNER</div>
+            <div class="partnership-image">
+                <a href="https://aristonwashdry.gr" target="_blank">
+                    <img src="{{ url_for('static', filename='img/1new.png') }}" alt="Ariston Wash & Dry">
+                </a>
+            </div>
+            <div class="partnership-text">
+                <h2>Σε συνεργασία με την <span class="gradient-text">ARISTON Wash & Dry</span></h2>
+                <p>
+                    Το κορυφαίο self-service πλυντήριο και στεγνωτήριο στη Σάμο! 
+                    Προσφέρει άπειρες υπηρεσίες και υπερσύγχρονο εξοπλισμό για τον καθαρισμό των ρούχων σας εύκολα και γρήγορα.
+                </p>
+                <div class="partnership-link-box">
+                    <i class="fas fa-external-link-alt"></i>
+                    <a href="https://aristonwashdry.gr" target="_blank">aristonwashdry.gr</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
         <p>&copy; 2026 QRForge Premium. Crafted with ❤️ by <strong>Konstantinos Georgoudis</strong>.</p>
         <div class="footer-links" style="margin: 20px 0;">
-            <a href="/legal" style="color:#6366f1">Privacy Policy</a> | 
-            <a href="/legal" style="color:#6366f1">Terms of Service</a>
+            <a href="/legal" style="color:#6366f1; text-decoration: none;">Privacy Policy</a> | 
+            <a href="/legal" style="color:#6366f1; text-decoration: none;">Terms of Service</a>
         </div>
         <p style="font-size: 0.8rem; opacity: 0.5;">Stable Version 2.0 • Serverless Core</p>
     </footer>
 
     <div id="cookie-banner">
-        <p><i class="fas fa-cookie-bite" style="color: #f59e0b"></i> Χρησιμοποιούμε cookies για να σας προσφέρουμε την καλύτερη εμπειρία. <a href="/legal">Μάθετε περισσότερα</a>.</p>
-        <div class="cookie-btns">
-            <button class="accept-btn" onclick="closeCookies()">ΕΓΙΝΕ!</button>
-        </div>
+        <p style="margin:0;"><i class="fas fa-cookie-bite" style="color: #f59e0b"></i> Χρησιμοποιούμε cookies για την καλύτερη εμπειρία σας.</p>
+        <button class="accept-btn" onclick="closeCookies()">ΕΓΙΝΕ!</button>
     </div>
 
     <script>
-        // Smooth Cookie Closure
         function closeCookies() {
             const banner = document.getElementById('cookie-banner');
-            banner.style.transform = 'translateY(100%)';
-            banner.style.transition = '0.5s ease-in-out';
-            setTimeout(() => banner.style.display = 'none', 500);
+            banner.style.display = 'none';
         }
 
-        // Particle Canvas Background
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let dots = [];
@@ -219,7 +299,7 @@
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = 'rgba(99, 102, 241, 0.2)';
+            ctx.fillStyle = 'rgba(99, 102, 241, 0.1)';
             dots.forEach(d => {
                 ctx.beginPath();
                 ctx.arc(d.x, d.y, d.r, 0, Math.PI*2);
