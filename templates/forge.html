@@ -7,29 +7,31 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <style>
-        /* Διόρθωση για να φαίνονται οι επιλογές του Editor */
-        .ql-toolbar.ql-snow { background: #f1f5f9; border-radius: 12px 12px 0 0; }
-        #editor-container { background: white; color: black; border-radius: 0 0 12px 12px; min-height: 200px; }
-    </style>
 </head>
 <body class="forge-page">
+
+    <nav>
+        <a href="/" class="logo">QR<span>FORGE</span></a>
+    </nav>
+
     <div class="forge-container">
         <div class="forge-panel settings">
-            <div class="panel-header">
-                <a href="/" class="back-btn"><i class="fas fa-arrow-left"></i> Πίσω</a>
-                <h2>Forge <span class="gradient-text">{{ qr_type.upper() }}</span></h2>
-            </div>
-            
             <div class="scroll-content">
+                <div class="panel-header" style="margin-bottom: 20px;">
+                    <a href="/" class="back-btn" style="text-decoration:none; color: var(--accent-color); font-weight:bold;">
+                        <i class="fas fa-arrow-left"></i> Πίσω
+                    </a>
+                    <h2 style="margin-top:10px;">Forge <span class="gradient-text">{{ qr_type.upper() }}</span></h2>
+                </div>
+                
                 <div class="card-inner">
                     <label class="section-label">1. Περιεχόμενο QR</label>
                     {% if qr_type == 'text' %}
                         <div id="editor-container"></div>
                     {% elif qr_type in ['image', 'pdf', 'music', 'zip'] %}
-                        <div class="upload-zone" onclick="document.getElementById('file-input').click()">
-                            <i class="fas fa-file-archive"></i>
-                            <p>Κάντε κλικ για ανέβασμα {{ qr_type.upper() }}</p>
+                        <div class="upload-zone" id="drop-zone">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--accent-color); margin-bottom: 10px;"></i>
+                            <p id="file-status">Κάντε κλικ για ανέβασμα {{ qr_type.upper() }}</p>
                             <input type="file" id="file-input" hidden>
                         </div>
                     {% else %}
@@ -53,8 +55,8 @@
                 <div class="card-inner">
                     <label class="section-label">{% if qr_type == 'social' %}3{% else %}2{% endif %}. Custom Logo στο Κέντρο</label>
                     <div class="upload-zone" style="padding: 15px;" onclick="document.getElementById('user-logo').click()">
-                        <i class="fas fa-image" style="font-size: 1.2rem;"></i>
-                        <p style="font-size: 0.8rem;">Ανεβάστε δικό σας Logo (PNG/JPG)</p>
+                        <i class="fas fa-image" style="font-size: 1.2rem; margin-bottom: 5px;"></i>
+                        <p style="font-size: 0.8rem; margin:0;">Ανεβάστε δικό σας Logo (PNG/JPG)</p>
                         <input type="file" id="user-logo" hidden accept="image/*">
                     </div>
                 </div>
@@ -71,11 +73,12 @@
                             <input type="color" id="bg-color-input" value="#ffffff">
                         </div>
                     </div>
-                    <label style="margin-top: 15px; display: block; font-size: 0.8rem;">Στυλ Τελείας</label>
-                    <select id="dot-style" class="premium-select">
+                    <label style="margin-top: 15px; display: block; font-size: 0.8rem; color: var(--text-dim);">Στυλ Τελείας</label>
+                    <select id="dot-style" class="premium-input" style="margin-top:5px;">
                         <option value="rounded">Στρογγυλεμένα</option>
                         <option value="dots">Κύκλοι</option>
                         <option value="square">Τετράγωνα</option>
+                        <option value="extra-rounded">Extra Rounded</option>
                         <option value="classy">Classy</option>
                     </select>
                 </div>
@@ -83,14 +86,15 @@
         </div>
 
         <div class="forge-panel preview">
-            <div class="preview-sticky">
-                <div id="canvas-container">
-                    <div id="qrcode"></div>
-                </div>
-                <button class="download-btn">
-                    <i class="fas fa-download"></i> DOWNLOAD PNG
-                </button>
+            <div id="canvas-container">
+                <div id="qrcode"></div>
             </div>
+            <button class="download-btn">
+                <i class="fas fa-download"></i> DOWNLOAD QR CODE
+            </button>
+            <p style="margin-top: 15px; font-size: 0.8rem; color: var(--text-dim);">
+                <i class="fas fa-info-circle"></i> Η λήψη γίνεται σε υψηλή ανάλυση .PNG
+            </p>
         </div>
     </div>
 
@@ -98,14 +102,14 @@
     <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
     
     <script>
-        // Αρχικοποίηση Quill Editor με πλήρες Toolbar
         if (document.getElementById('editor-container')) {
             var quill = new Quill('#editor-container', {
                 theme: 'snow',
+                placeholder: 'Γράψτε το κείμενό σας εδώ...',
                 modules: {
                     toolbar: [
                         ['bold', 'italic', 'underline'],
-                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'color': [] }],
                         [{ 'list': 'ordered'}, { 'list': 'bullet' }],
                         ['clean']
                     ]
@@ -113,50 +117,8 @@
             });
         }
     </script>
+    
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script>
-    // Λειτουργία για την αλλαγή Logo (Social & Custom)
-    function setQRLogo(type) {
-        let logoUrl = '';
-        const logos = {
-            'instagram': 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg',
-            'tiktok': 'https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg',
-            'youtube': 'https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg',
-            'whatsapp': 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
-            'facebook': 'https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg'
-        };
-        
-        logoUrl = logos[type] || '';
-        
-        // Ενημέρωση του QR Code (Προϋποθέτει ότι το qrCode object υπάρχει στο main.js)
-        if (window.qrCode) {
-            window.qrCode.update({
-                image: logoUrl,
-                imageOptions: { hideBackgroundDots: true, imageSize: 0.4, margin: 5 }
-            });
-        }
-        
-        // Active Class στα buttons
-        document.querySelectorAll('.logo-opt').forEach(btn => btn.classList.remove('active'));
-        event.currentTarget.classList.add('active');
-    }
 
-    // Ανέβασμα Custom Logo από τον χρήστη
-    document.getElementById('user-logo').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                if (window.qrCode) {
-                    window.qrCode.update({
-                        image: event.target.result,
-                        imageOptions: { hideBackgroundDots: true, imageSize: 0.4, margin: 5 }
-                    });
-                }
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-</script>
 </body>
 </html>

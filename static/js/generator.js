@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const qrElement = document.getElementById("qrcode");
     if (!qrElement) return;
 
-    // 1. Αρχικοποίηση QR Code
+    // 1. Αρχικοποίηση QR Code με βελτιωμένες ρυθμίσεις εικόνας
     const qrCode = new QRCodeStyling({
         width: 300,
         height: 300,
@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
         data: "https://qrforge.gr",
         image: "", 
         dotsOptions: {
-            color: "#0f172a",
+            color: "#38bdf8", // Χρησιμοποιούμε το accent color ως default
             type: "rounded"
         },
         backgroundOptions: {
@@ -19,25 +19,40 @@ document.addEventListener("DOMContentLoaded", () => {
         imageOptions: {
             crossOrigin: "anonymous",
             margin: 5,
-            hideBackgroundDots: true 
+            hideBackgroundDots: true,
+            imageSize: 0.4 // Σταθερό μέγεθος για τα logos στο κέντρο
         }
     });
 
     qrCode.append(qrElement);
 
     // --- ΛΕΙΤΟΥΡΓΙΑ LOGO SELECTION ---
+    // Χρησιμοποιούμε window για να είναι προσβάσιμη από το HTML onclick
     window.setQRLogo = function(type) {
         let logoUrl = "";
-        if (type === 'instagram') logoUrl = "https://cdn-icons-png.flaticon.com/512/174/174855.png";
-        if (type === 'tiktok') logoUrl = "https://cdn-icons-png.flaticon.com/512/3046/3046121.png";
-        if (type === 'whatsapp') logoUrl = "https://cdn-icons-png.flaticon.com/512/733/733585.png";
-        if (type === 'facebook') logoUrl = "https://cdn-icons-png.flaticon.com/512/733/733547.png";
+        const logos = {
+            'instagram': 'https://cdn-icons-png.flaticon.com/512/174/174855.png',
+            'tiktok': 'https://cdn-icons-png.flaticon.com/512/3046/3046121.png',
+            'whatsapp': 'https://cdn-icons-png.flaticon.com/512/733/733585.png',
+            'facebook': 'https://cdn-icons-png.flaticon.com/512/733/733547.png',
+            'youtube': 'https://cdn-icons-png.flaticon.com/512/1384/1384060.png'
+        };
         
-        qrCode.update({ image: logoUrl });
+        logoUrl = logos[type] || "";
+        
+        qrCode.update({ 
+            image: logoUrl,
+            imageOptions: { imageSize: 0.4, margin: 5 }
+        });
+
+        // UI Update για το ποιο κουμπί είναι ενεργό
         document.querySelectorAll('.logo-opt').forEach(btn => btn.classList.remove('active'));
-        if (event) event.currentTarget.classList.add('active');
+        if (window.event && window.event.currentTarget) {
+            window.event.currentTarget.classList.add('active');
+        }
     };
 
+    // --- ΑΝΕΒΑΣΜΑ CUSTOM LOGO ΑΠΟ ΧΡΗΣΤΗ ---
     const userLogoInput = document.getElementById('user-logo');
     if (userLogoInput) {
         userLogoInput.addEventListener("change", (e) => {
@@ -45,7 +60,10 @@ document.addEventListener("DOMContentLoaded", () => {
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    qrCode.update({ image: event.target.result });
+                    qrCode.update({ 
+                        image: event.target.result,
+                        imageOptions: { imageSize: 0.4, margin: 5 }
+                    });
                 };
                 reader.readAsDataURL(file);
             }
@@ -54,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- RICH TEXT EDITOR (QUILL) ---
     const editorContainer = document.getElementById('editor-container');
-    if (editorContainer) {
+    if (editorContainer && typeof Quill !== 'undefined') {
         var quill = new Quill('#editor-container', { 
             theme: 'snow',
             modules: {
@@ -81,22 +99,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then(data => {
                     if (data.url) {
                         qrCode.update({ data: data.url });
-                        console.log("QR updated with link: " + data.url);
                     }
-                });
+                })
+                .catch(err => console.error("Error saving text:", err));
             }, 1000); 
         });
     }
 
-    // --- ΑΠΛΟ INPUT (URL κλπ) ---
+    // --- ΑΠΛΟ INPUT (URL / USERNAME) ---
     const standardInput = document.getElementById("qr-data");
     if (standardInput) {
         standardInput.addEventListener("input", (e) => {
-            qrCode.update({ data: e.target.value || " " });
+            qrCode.update({ data: e.target.value || "https://qrforge.gr" });
         });
     }
 
-    // --- ΕΠΙΛΟΓΕΣ ΕΜΦΑΝΙΣΗΣ (ΧΡΩΜΑΤΑ/ΣΤΥΛ) ---
+    // --- ΡΥΘΜΙΣΕΙΣ ΧΡΩΜΑΤΩΝ ΚΑΙ ΣΤΥΛ ---
     const dotColorPicker = document.getElementById("dot-color");
     if (dotColorPicker) {
         dotColorPicker.addEventListener("input", (e) => {
@@ -118,27 +136,36 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- ΑΝΕΒΑΣΜΑ ΑΡΧΕΙΩΝ ---
+    // --- ΑΝΕΒΑΣΜΑ ΑΡΧΕΙΩΝ (PDF, ZIP, IMAGE, MUSIC) ---
     const fileInput = document.getElementById('file-input');
-    const dropZone = document.getElementById('drop-zone');
-    if (dropZone && fileInput) {
-        dropZone.onclick = () => fileInput.click();
-        fileInput.onchange = (e) => {
+    // Χρησιμοποιούμε το upload-zone class από το HTML σου
+    const uploadZones = document.querySelectorAll('.upload-zone'); 
+    
+    if (fileInput) {
+        fileInput.addEventListener("change", (e) => {
             const file = e.target.files[0];
             if (!file) return;
-            const status = document.getElementById('file-status');
-            if (status) status.innerText = "Ανεβάζει: " + file.name;
+
+            // Εύρεση του text μέσα στο upload zone για feedback
+            const uploadText = e.target.parentElement.querySelector('p');
+            if (uploadText) uploadText.innerText = "Ανεβάζει: " + file.name + "...";
+
             let formData = new FormData();
             formData.append('file', file);
+
             fetch('/upload', { method: 'POST', body: formData })
             .then(res => res.json())
             .then(data => {
                 if (data.url) {
                     qrCode.update({ data: data.url });
-                    if (status) status.innerText = "Επιτυχία! Το QR είναι έτοιμο.";
+                    if (uploadText) uploadText.innerText = "Επιτυχία! " + file.name;
                 }
+            })
+            .catch(err => {
+                if (uploadText) uploadText.innerText = "Σφάλμα ανεβάσματος.";
+                console.error(err);
             });
-        };
+        });
     }
 
     // --- DOWNLOAD ---
