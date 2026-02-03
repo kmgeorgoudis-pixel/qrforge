@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forge your QR | QRForge</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favico.png') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+</head>
+<body class="forge-page">
+    <div class="background-blobs"></div>
+
+    <div class="forge-container">
+        <div class="forge-panel settings">
+            <a href="/" class="back-btn"><i class="fas fa-arrow-left"></i> Πίσω</a>
+            <h2>Σφυρηλάτηση <span class="gradient-text">{{ qr_type.upper() }}</span></h2>
+            
+            <div class="input-group">
+                <label>Περιεχόμενο QR:</label>
+                {% if qr_type == 'text' %}
+                    <div id="editor-container" style="height: 200px; background: white; color: black; border-radius: 12px;"></div>
+                {% elif qr_type in ['image', 'pdf', 'music'] %}
+                    <div class="upload-zone" id="drop-zone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Σύρετε το αρχείο εδώ ή κάντε κλικ</p>
+                        <input type="file" id="file-input" hidden accept=".pdf,.png,.jpg,.jpeg,.mp3">
+                    </div>
+                    <p id="file-status" style="margin-top:10px; font-size:0.8rem; color:var(--accent-color);"></p>
+                {% else %}
+                    <input type="text" id="qr-data" placeholder="Εισάγετε δεδομένα εδώ...">
+                {% endif %}
+            </div>
+
+            <div class="customization">
+                <h3>Σχεδίαση & Χρώματα</h3>
+                <div class="control-row">
+                    <div class="control-group">
+                        <label>Χρώμα QR</label>
+                        <input type="color" id="dot-color" value="#0f172a">
+                    </div>
+                    <div class="control-group">
+                        <label>Φόντο</label>
+                        <input type="color" id="bg-color-input" value="#ffffff">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Στυλ Τελείας (Dots)</label>
+                    <select id="dot-style">
+                        <option value="rounded">Στρογγυλεμένα</option>
+                        <option value="dots">Κύκλοι</option>
+                        <option value="classy">Classy</option>
+                        <option value="square">Τετράγωνα</option>
+                    </select>
+                </div>
+
+                <div class="control-group" style="margin-top: 20px;">
+                    <label>Εικονίδιο στο κέντρο</label>
+                    
+                    {# Εμφάνιση Social Icons ΜΟΝΟ αν ο τύπος είναι social #}
+                    {% if qr_type == 'social' %}
+                    <div class="logo-grid">
+                        <button class="logo-opt active" onclick="setQRLogo('')" title="Κανένα">None</button>
+                        <button class="logo-opt" onclick="setQRLogo('instagram')" title="Instagram"><i class="fab fa-instagram"></i></button>
+                        <button class="logo-opt" onclick="setQRLogo('tiktok')" title="TikTok"><i class="fab fa-tiktok"></i></button>
+                        <button class="logo-opt" onclick="setQRLogo('whatsapp')" title="WhatsApp"><i class="fab fa-whatsapp"></i></button>
+                        <button class="logo-opt" onclick="setQRLogo('facebook')" title="Facebook"><i class="fab fa-facebook"></i></button>
+                    </div>
+                    {% endif %}
+                    
+                    {# Το κουμπί για δικό σου Logo παραμένει παντού #}
+                    <div class="custom-logo-upload">
+                        <label for="user-logo" class="custom-upload-btn">
+                            <i class="fas fa-upload"></i> Ανέβασε δικό σου Logo
+                        </label>
+                        <input type="file" id="user-logo" hidden accept="image/*">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="forge-panel preview">
+            <div id="canvas-container">
+                <div id="qrcode"></div>
+            </div>
+            <button class="download-btn">Download PNG</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+    <script src="{{ url_for('static', filename='js/generator.js') }}"></script>
+</body>
+</html>

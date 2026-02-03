@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QRForge | Προβολή Κειμένου</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; padding: 20px; }
+        .content-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); max-width: 600px; width: 100%; line-height: 1.6; }
+        .content-card img { max-width: 100%; border-radius: 10px; }
+        .content-card ul, .content-card ol { padding-left: 20px; }
+    </style>
+</head>
+<body>
+    <div class="content-card">
+        {{ content | safe }}
+    </div>
+</body>
+</html>
