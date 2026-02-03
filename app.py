@@ -7,18 +7,20 @@ from bson.objectid import ObjectId
 app = Flask(__name__)
 
 # --- ΣΥΝΔΕΣΗ ΜΕ MONGO DB ATLAS ---
+# Δοκιμάζουμε χωρίς SSL verification και με άμεσο string
 MONGO_URI = "mongodb+srv://kmgeorgoudis_db_user:LKcu5a70s2zTeidM@cluster0.63qtir3.mongodb.net/qrforge?retryWrites=true&w=majority"
 
 try:
+    # Αφαιρούμε το certifi και βάζουμε tlsAllowInvalidCertificates
     client = MongoClient(
         MONGO_URI,
-        tlsCAFile=certifi.where(),
-        tlsAllowInvalidCertificates=True 
+        tls=True,
+        tlsAllowInvalidCertificates=True
     )
     db = client.get_database("qrforge")
     texts_collection = db.texts
     
-    # Δοκιμή σύνδεσης
+    # Force σύνδεση
     client.admin.command('ping')
     print("✅ Επιτυχής σύνδεση στη MongoDB Atlas!")
 except Exception as e:
