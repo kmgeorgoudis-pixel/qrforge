@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- 2. SOCIAL LOGOS ---
-    window.setQRLogo = function(type) {
+    window.setQRLogo = function(type, element) {
         const logos = {
             'instagram': 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg',
             'tiktok': 'https://cdn.pixabay.com/photo/2021/06/15/12/28/tiktok-6338429_1280.png',
@@ -46,10 +46,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // UI Update: Active state
         document.querySelectorAll('.logo-opt').forEach(btn => btn.classList.remove('active'));
-        if (event && event.currentTarget) {
-            event.currentTarget.classList.add('active');
+        if (element) {
+            element.classList.add('active');
         }
     };
+
+    // --- 2.1 ΣΥΝΔΕΣΗ CLICKS ΣΤΑ SOCIAL BUTTONS (Η ΔΙΟΡΘΩΣΗ) ---
+    document.querySelectorAll('.logo-opt').forEach(button => {
+        button.addEventListener('click', function() {
+            const socialType = this.getAttribute('data-social');
+            window.setQRLogo(socialType, this);
+        });
+    });
 
     // --- 3. CUSTOM LOGO UPLOAD ---
     const userLogoInput = document.getElementById("user-logo");
@@ -80,7 +88,6 @@ document.addEventListener("DOMContentLoaded", () => {
         saveTextBtn.addEventListener("click", () => {
             const htmlContent = quill.root.innerHTML;
             
-            // Οπτικό feedback
             saveTextBtn.innerText = "ΑΠΟΘΗΚΕΥΣΗ...";
             saveTextBtn.disabled = true;
 
@@ -94,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (data.url) {
                     qrCode.update({ data: data.url });
                     saveTextBtn.innerText = "ΕΠΙΤΥΧΙΑ! ✅";
-                    saveTextBtn.style.background = "#22c55e"; // Πράσινο
+                    saveTextBtn.style.background = "#22c55e";
                 } else {
                     alert("Σφάλμα κατά την αποθήκευση.");
                     saveTextBtn.innerText = "ΔΟΚΙΜΑΣΤΕ ΞΑΝΑ";

@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     qrCode.append(qrElement);
 
     // --- 2. ΛΕΙΤΟΥΡΓΙΑ SOCIAL LOGO SELECTION ---
-    window.setQRLogo = function(type) {
+    window.setQRLogo = function(type, element) {
         const logos = {
             'instagram': 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg',
             'tiktok': 'https://cdn.pixabay.com/photo/2021/06/15/12/28/tiktok-6338429_1280.png',
@@ -44,10 +44,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // UI Update: Active state στα εικονίδια
         document.querySelectorAll('.logo-opt').forEach(btn => btn.classList.remove('active'));
-        if (window.event && window.event.currentTarget) {
-            window.event.currentTarget.classList.add('active');
+        if (element) {
+            element.classList.add('active');
         }
     };
+
+    // --- 2.1 ΣΥΝΔΕΣΗ ΤΩΝ CLICKS ΣΤΑ SOCIAL BUTTONS (Η ΔΙΟΡΘΩΣΗ) ---
+    document.querySelectorAll('.logo-opt').forEach(button => {
+        button.addEventListener('click', function() {
+            const socialType = this.getAttribute('data-social');
+            window.setQRLogo(socialType, this);
+        });
+    });
 
     // --- 3. ΑΝΕΒΑΣΜΑ CUSTOM LOGO ΑΠΟ ΧΡΗΣΤΗ ---
     const userLogoInput = document.getElementById('user-logo');
@@ -65,12 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- 4. RICH TEXT EDITOR (QUILL) -> MONGODB ---
-    // Χρησιμοποιούμε το κουμπί "Οριστικοποίηση" για σιγουριά, 
-    // ή το typingTimer που είχες για αυτόματη αποθήκευση.
-    const saveTextBtn = document.getElementById("save-text-btn");
-    
-    if (typeof quill !== 'undefined') {
-        // Αν θέλεις αυτόματη αποθήκευση καθώς γράφει:
+    if (typeof quill !== 'undefined' && quill !== null) {
         let typingTimer;
         quill.on('text-change', () => {
             clearTimeout(typingTimer);
@@ -87,11 +90,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then(data => {
                     if (data.url) {
                         qrCode.update({ data: data.url });
-                        console.log("Saved to Cloud!");
                     }
                 })
                 .catch(err => console.error("Error saving to MongoDB:", err));
-            }, 1200); // Περιμένει 1.2 δευτερόλεπτα αφού σταματήσει η πληκτρολόγηση
+            }, 1200);
         });
     }
 
