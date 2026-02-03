@@ -1,6 +1,6 @@
 /**
- * QRForge - Main Logic
- * Σύνδεση QR Styling, Quill Editor και File Uploads
+ * QRForge - Main Logic (Cloud Edition)
+ * Σύνδεση QR Styling, Quill Editor και MongoDB Atlas
  */
 
 // 1. Καθολική Αρχικοποίηση QR Code
@@ -42,14 +42,12 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         const logoUrl = logos[type] || "";
-        qrCode.update({
-            image: logoUrl
-        });
+        qrCode.update({ image: logoUrl });
 
-        // UI Update: Active state στα κουμπιά
+        // UI Update: Active state
         document.querySelectorAll('.logo-opt').forEach(btn => btn.classList.remove('active'));
-        if (window.event && window.event.currentTarget) {
-            window.event.currentTarget.classList.add('active');
+        if (event && event.currentTarget) {
+            event.currentTarget.classList.add('active');
         }
     };
 
@@ -68,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- 4. DATA INPUTS (URL, TEXT, κλπ) ---
+    // --- 4. URL & SOCIAL INPUTS ---
     const qrInput = document.getElementById("qr-data");
     if (qrInput) {
         qrInput.addEventListener("input", (e) => {
@@ -76,20 +74,40 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- 5. RICH TEXT EDITOR (QUILL) ---
-    // Περιμένουμε το Quill να αρχικοποιηθεί από το HTML
-    setTimeout(() => {
-        if (typeof quill !== 'undefined') {
-            quill.on('text-change', function() {
-                const text = quill.getText().trim();
-                if (text.length > 0) {
-                    // Εδώ στέλνουμε το κείμενο στο backend αν θέλουμε μόνιμο link
-                    // Για τώρα ενημερώνουμε το QR απευθείας με το κείμενο
-                    qrCode.update({ data: text });
+    // --- 5. RICH TEXT SAVE (MONGODB) ---
+    const saveTextBtn = document.getElementById("save-text-btn");
+    if (saveTextBtn && typeof quill !== 'undefined') {
+        saveTextBtn.addEventListener("click", () => {
+            const htmlContent = quill.root.innerHTML;
+            
+            // Οπτικό feedback
+            saveTextBtn.innerText = "ΑΠΟΘΗΚΕΥΣΗ...";
+            saveTextBtn.disabled = true;
+
+            fetch('/save-text', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: htmlContent })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.url) {
+                    qrCode.update({ data: data.url });
+                    saveTextBtn.innerText = "ΕΠΙΤΥΧΙΑ! ✅";
+                    saveTextBtn.style.background = "#22c55e"; // Πράσινο
+                } else {
+                    alert("Σφάλμα κατά την αποθήκευση.");
+                    saveTextBtn.innerText = "ΔΟΚΙΜΑΣΤΕ ΞΑΝΑ";
+                    saveTextBtn.disabled = false;
                 }
+            })
+            .catch(err => {
+                console.error(err);
+                saveTextBtn.innerText = "ΣΦΑΛΜΑ ΣΥΝΔΕΣΗΣ";
+                saveTextBtn.disabled = false;
             });
-        }
-    }, 500);
+        });
+    }
 
     // --- 6. STYLE CONTROLS ---
     const dotColor = document.getElementById("dot-color");
@@ -113,45 +131,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- 7. FILE UPLOAD (PDF, ZIP, κλπ) ---
-    const fileInput = document.getElementById('file-input');
-    if (fileInput) {
-        fileInput.addEventListener("change", function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const formData = new FormData();
-            formData.append('file', file);
-
-            // Οπτικό feedback
-            const uploadZone = document.querySelector('.upload-zone p');
-            if (uploadZone) uploadZone.innerText = "Ανεβάζει: " + file.name;
-
-            fetch('/upload', { method: 'POST', body: formData })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.url) {
-                        qrCode.update({ data: data.url });
-                        if (uploadZone) uploadZone.innerText = "Επιτυχία! Το QR ενημερώθηκε.";
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    if (uploadZone) uploadZone.innerText = "Σφάλμα ανεβάσματος.";
-                });
-        });
-    }
-
-    // --- 8. DOWNLOAD ---
-    const downloadBtn = document.querySelector(".download-btn");
+    // --- 7. DOWNLOAD ---
+    const downloadBtn = document.getElementById("download-btn");
     if (downloadBtn) {
         downloadBtn.addEventListener("click", () => {
             qrCode.download({ name: "qrforge-code", extension: "png" });
         });
     }
 });
-
-// --- 9. NAVIGATION ---
-function selectType(type) {
-    window.location.href = "/forge/" + type;
-}

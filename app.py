@@ -1,23 +1,24 @@
 import os
-import uuid
-import json
 from flask import Flask, render_template, request, jsonify, url_for
-from werkzeug.utils import secure_filename
+from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
 
-# --- ΡΥΘΜΙΣΕΙΣ ΑΣΦΑΛΕΙΑΣ & ΦΑΚΕΛΩΝ ---
-UPLOAD_FOLDER = 'static/uploads'
-TEXTS_FOLDER = 'static/texts'
-# Περιορισμός μεγέθους αρχείου στα 16MB
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 
+# --- ΣΥΝΔΕΣΗ ΜΕ MONGO DB ATLAS ---
+# Χρησιμοποιούμε το δικό σου Connection String
+MONGO_URI = "mongodb+srv://kmgeorgoudis_db_user:LKcu5a70s2zTeidM@cluster0.63qtir3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
-# Δημιουργία φακέλων αν δεν υπάρχουν
-for folder in [UPLOAD_FOLDER, TEXTS_FOLDER]:
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+try:
+    # Σύνδεση με τη βάση
+    client = MongoClient(MONGO_URI)
+    db = client.qrforge
+    texts_collection = db.texts
+    # Έλεγχος αν η σύνδεση είναι ενεργή
+    client.admin.command('ping')
+    print("✅ Επιτυχής σύνδεση στη MongoDB Atlas!")
+except Exception as e:
+    print(f"❌ Σφάλμα σύνδεσης στη MongoDB: {e}")
 
 # --- ROUTES ---
 
@@ -27,78 +28,53 @@ def index():
 
 @app.route('/forge/<type>')
 def forge(type):
-    # Έλεγχος αν ο τύπος είναι έγκυρος (προαιρετικά)
-    valid_types = ['url', 'text', 'social', 'pdf', 'image', 'music', 'zip']
+    # Επιτρέπουμε μόνο τους τύπους που υποστηρίζουμε τώρα
+    valid_types = ['url', 'social', 'text']
     if type not in valid_types:
         type = 'url'
     return render_template('forge.html', qr_type=type)
+@app.route('/legal')
+def legal():
+    return render_template('legal.html')
 
-# 1. Upload για Αρχεία (Images, PDFs, κλπ)
-@app.route('/upload', methods=['POST'])
-def upload_file():
-    if 'file' not in request.files:
-        return jsonify({'error': 'Δεν βρέθηκε αρχείο'}), 400
-    
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'Δεν επιλέχθηκε αρχείο'}), 400
-
-    if file:
-        # Καθαρισμός ονόματος και προσθήκη UUID για αποφυγή overwrites
-        original_name = secure_filename(file.filename)
-        unique_id = uuid.uuid4().hex[:8]
-        filename = f"{unique_id}_{original_name}"
-        
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(file_path)
-        
-        # Επιστροφή του πλήρους URL για το QR
-        file_url = url_for('static', filename='uploads/' + filename, _external=True)
-        return jsonify({'url': file_url})
-
-# 2. Αποθήκευση Rich Text από τον Quill Editor
+# Αποθήκευση Rich Text στη MongoDB
 @app.route('/save-text', methods=['POST'])
 def save_text():
-    data = request.get_json()
-    if not data or 'content' not in data:
-        return jsonify({'error': 'Κενό περιεχόμενο'}), 400
-
-    content = data.get('content')
-
-    # Δημιουργία μοναδικού ID για τη σελίδα κειμένου
-    text_id = uuid.uuid4().hex[:10]
-    file_path = os.path.join(TEXTS_FOLDER, f"{text_id}.json")
-    
     try:
-        with open(file_path, 'w', encoding='utf-8') as f:
-            json.dump({'content': content}, f, ensure_ascii=False)
+        data = request.get_json()
+        content = data.get('content')
         
-        # Το URL που θα κωδικοποιηθεί στο QR
+        if not content:
+            return jsonify({'error': 'Το περιεχόμενο είναι κενό'}), 400
+
+        # Εισαγωγή στη βάση δεδομένων
+        result = texts_collection.insert_one({'content': content})
+        text_id = str(result.inserted_id)
+        
+        # Δημιουργία του URL που θα μπει στο QR code
         view_url = url_for('view_text', text_id=text_id, _external=True)
         return jsonify({'url': view_url})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# 3. Η σελίδα προβολής του κειμένου (Scan Result)
+# Προβολή του κειμένου (Η σελίδα που ανοίγει το QR)
 @app.route('/view-text/<text_id>')
 def view_text(text_id):
-    file_path = os.path.join(TEXTS_FOLDER, f"{text_id}.json")
-    
-    if os.path.exists(file_path):
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
+    try:
+        # Αναζήτηση στη βάση με το ID της MongoDB (ObjectId)
+        data = texts_collection.find_one({'_id': ObjectId(text_id)})
+        
+        if data:
             return render_template('view_text.html', content=data['content'])
-        except Exception:
-            return "Σφάλμα κατά την ανάγνωση του αρχείου", 500
-            
-    return "Το περιεχόμενο δεν βρέθηκε ή έχει διαγραφεί", 404
+        return "Το περιεχόμενο δεν βρέθηκε", 404
+    except Exception:
+        return "Μη έγκυρο ID περιεχομένου", 400
 
 # --- ERROR HANDLERS ---
-@app.errorhandler(413)
-def request_entity_too_large(error):
-    return jsonify({'error': 'Το αρχείο είναι πολύ μεγάλο (Max 16MB)'}), 413
+@app.errorhandler(404)
+def page_not_found(e):
+    return "Η σελίδα δεν βρέθηκε", 404
 
 if __name__ == '__main__':
-    # Χρήση 0.0.0.0 για να είναι προσβάσιμο στο τοπικό δίκτυο από κινητό για test
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # Χρήση debug=True για τοπικές δοκιμές
+    app.run(debug=True)

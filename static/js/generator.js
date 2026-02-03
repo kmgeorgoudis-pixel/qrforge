@@ -1,8 +1,11 @@
+/**
+ * QRForge - Generator Logic (MongoDB Atlas Edition)
+ */
 document.addEventListener("DOMContentLoaded", () => {
     const qrElement = document.getElementById("qrcode");
     if (!qrElement) return;
 
-    // 1. Αρχικοποίηση QR Code με βελτιωμένες ρυθμίσεις εικόνας
+    // 1. Αρχικοποίηση QR Code με premium ρυθμίσεις
     const qrCode = new QRCodeStyling({
         width: 300,
         height: 300,
@@ -10,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
         data: "https://qrforge.gr",
         image: "", 
         dotsOptions: {
-            color: "#38bdf8", // Χρησιμοποιούμε το accent color ως default
+            color: "#38bdf8",
             type: "rounded"
         },
         backgroundOptions: {
@@ -20,39 +23,33 @@ document.addEventListener("DOMContentLoaded", () => {
             crossOrigin: "anonymous",
             margin: 5,
             hideBackgroundDots: true,
-            imageSize: 0.4 // Σταθερό μέγεθος για τα logos στο κέντρο
+            imageSize: 0.4
         }
     });
 
     qrCode.append(qrElement);
 
-    // --- ΛΕΙΤΟΥΡΓΙΑ LOGO SELECTION ---
-    // Χρησιμοποιούμε window για να είναι προσβάσιμη από το HTML onclick
+    // --- 2. ΛΕΙΤΟΥΡΓΙΑ SOCIAL LOGO SELECTION ---
     window.setQRLogo = function(type) {
-        let logoUrl = "";
         const logos = {
-            'instagram': 'https://cdn-icons-png.flaticon.com/512/174/174855.png',
-            'tiktok': 'https://cdn-icons-png.flaticon.com/512/3046/3046121.png',
-            'whatsapp': 'https://cdn-icons-png.flaticon.com/512/733/733585.png',
-            'facebook': 'https://cdn-icons-png.flaticon.com/512/733/733547.png',
-            'youtube': 'https://cdn-icons-png.flaticon.com/512/1384/1384060.png'
+            'instagram': 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg',
+            'tiktok': 'https://cdn.pixabay.com/photo/2021/06/15/12/28/tiktok-6338429_1280.png',
+            'youtube': 'https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg',
+            'whatsapp': 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
+            'facebook': 'https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg'
         };
         
-        logoUrl = logos[type] || "";
-        
-        qrCode.update({ 
-            image: logoUrl,
-            imageOptions: { imageSize: 0.4, margin: 5 }
-        });
+        const logoUrl = logos[type] || "";
+        qrCode.update({ image: logoUrl });
 
-        // UI Update για το ποιο κουμπί είναι ενεργό
+        // UI Update: Active state στα εικονίδια
         document.querySelectorAll('.logo-opt').forEach(btn => btn.classList.remove('active'));
         if (window.event && window.event.currentTarget) {
             window.event.currentTarget.classList.add('active');
         }
     };
 
-    // --- ΑΝΕΒΑΣΜΑ CUSTOM LOGO ΑΠΟ ΧΡΗΣΤΗ ---
+    // --- 3. ΑΝΕΒΑΣΜΑ CUSTOM LOGO ΑΠΟ ΧΡΗΣΤΗ ---
     const userLogoInput = document.getElementById('user-logo');
     if (userLogoInput) {
         userLogoInput.addEventListener("change", (e) => {
@@ -60,35 +57,26 @@ document.addEventListener("DOMContentLoaded", () => {
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    qrCode.update({ 
-                        image: event.target.result,
-                        imageOptions: { imageSize: 0.4, margin: 5 }
-                    });
+                    qrCode.update({ image: event.target.result });
                 };
                 reader.readAsDataURL(file);
             }
         });
     }
 
-    // --- RICH TEXT EDITOR (QUILL) ---
-    const editorContainer = document.getElementById('editor-container');
-    if (editorContainer && typeof Quill !== 'undefined') {
-        var quill = new Quill('#editor-container', { 
-            theme: 'snow',
-            modules: {
-                toolbar: [
-                    ['bold', 'italic', 'underline'],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    ['clean']
-                ]
-            }
-        });
-
+    // --- 4. RICH TEXT EDITOR (QUILL) -> MONGODB ---
+    // Χρησιμοποιούμε το κουμπί "Οριστικοποίηση" για σιγουριά, 
+    // ή το typingTimer που είχες για αυτόματη αποθήκευση.
+    const saveTextBtn = document.getElementById("save-text-btn");
+    
+    if (typeof quill !== 'undefined') {
+        // Αν θέλεις αυτόματη αποθήκευση καθώς γράφει:
         let typingTimer;
         quill.on('text-change', () => {
             clearTimeout(typingTimer);
             typingTimer = setTimeout(() => {
                 const fullHTML = quill.root.innerHTML;
+                if (quill.getText().trim().length === 0) return;
 
                 fetch('/save-text', {
                     method: 'POST',
@@ -99,14 +87,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then(data => {
                     if (data.url) {
                         qrCode.update({ data: data.url });
+                        console.log("Saved to Cloud!");
                     }
                 })
-                .catch(err => console.error("Error saving text:", err));
-            }, 1000); 
+                .catch(err => console.error("Error saving to MongoDB:", err));
+            }, 1200); // Περιμένει 1.2 δευτερόλεπτα αφού σταματήσει η πληκτρολόγηση
         });
     }
 
-    // --- ΑΠΛΟ INPUT (URL / USERNAME) ---
+    // --- 5. ΑΠΛΟ INPUT (URL / SOCIAL) ---
     const standardInput = document.getElementById("qr-data");
     if (standardInput) {
         standardInput.addEventListener("input", (e) => {
@@ -114,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- ΡΥΘΜΙΣΕΙΣ ΧΡΩΜΑΤΩΝ ΚΑΙ ΣΤΥΛ ---
+    // --- 6. ΡΥΘΜΙΣΕΙΣ ΧΡΩΜΑΤΩΝ ΚΑΙ ΣΤΥΛ ---
     const dotColorPicker = document.getElementById("dot-color");
     if (dotColorPicker) {
         dotColorPicker.addEventListener("input", (e) => {
@@ -136,40 +125,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- ΑΝΕΒΑΣΜΑ ΑΡΧΕΙΩΝ (PDF, ZIP, IMAGE, MUSIC) ---
-    const fileInput = document.getElementById('file-input');
-    // Χρησιμοποιούμε το upload-zone class από το HTML σου
-    const uploadZones = document.querySelectorAll('.upload-zone'); 
-    
-    if (fileInput) {
-        fileInput.addEventListener("change", (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            // Εύρεση του text μέσα στο upload zone για feedback
-            const uploadText = e.target.parentElement.querySelector('p');
-            if (uploadText) uploadText.innerText = "Ανεβάζει: " + file.name + "...";
-
-            let formData = new FormData();
-            formData.append('file', file);
-
-            fetch('/upload', { method: 'POST', body: formData })
-            .then(res => res.json())
-            .then(data => {
-                if (data.url) {
-                    qrCode.update({ data: data.url });
-                    if (uploadText) uploadText.innerText = "Επιτυχία! " + file.name;
-                }
-            })
-            .catch(err => {
-                if (uploadText) uploadText.innerText = "Σφάλμα ανεβάσματος.";
-                console.error(err);
-            });
-        });
-    }
-
-    // --- DOWNLOAD ---
-    const downloadBtn = document.querySelector(".download-btn");
+    // --- 7. DOWNLOAD ---
+    const downloadBtn = document.getElementById("download-btn") || document.querySelector(".download-btn");
     if (downloadBtn) {
         downloadBtn.addEventListener("click", () => {
             qrCode.download({ name: "qrforge-code", extension: "png" });

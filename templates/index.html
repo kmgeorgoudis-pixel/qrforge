@@ -6,6 +6,58 @@
     <title>QRForge | Premium QR Generator</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .grid-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            padding: 20px;
+            justify-content: center;
+        }
+
+        /* Cookie Banner Style */
+        #cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1e293b;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 9999;
+            border-top: 2px solid var(--accent-color);
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+            font-size: 0.9rem;
+        }
+        .cookie-btns button {
+            padding: 8px 20px;
+            margin-left: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
+        }
+        .accept-btn { background: var(--accent-color); color: white; }
+        .reject-btn { background: transparent; border: 1px solid #475569 !important; color: #94a3b8; }
+
+        .footer-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+        .footer-links a:hover { color: var(--accent-color); }
+
+        @media (max-width: 600px) {
+            .grid-container { grid-template-columns: 1fr; }
+            #cookie-banner { flex-direction: column; text-align: center; gap: 15px; }
+        }
+    </style>
 </head>
 <body>
     <nav>
@@ -14,57 +66,57 @@
 
     <header class="hero">
         <h1>Τι θέλεις να <span class="gradient-text">σφυρηλατήσεις</span> σήμερα;</h1>
-        <p>Δημιουργήστε μοναδικά QR Codes με premium αισθητική και λειτουργικότητα.</p>
+        <p>Δημιουργήστε μοναδικά QR Codes με premium αισθητική και απόλυτη αξιοπιστία.</p>
     </header>
 
     <main class="grid-container">
         <div class="card" onclick="location.href='/forge/url'">
+            <div class="card-glow"></div>
             <i class="fas fa-link"></i>
             <h3>URL</h3>
             <p>Links & Ιστοσελίδες</p>
         </div>
 
-        <div class="card" onclick="location.href='/forge/text'">
-            <i class="fas fa-align-left"></i>
-            <h3>Rich Text</h3>
-            <p>Κείμενο & Σημειώσεις</p>
-        </div>
-
         <div class="card" onclick="location.href='/forge/social'">
+            <div class="card-glow"></div>
             <i class="fas fa-share-nodes"></i>
             <h3>Social Media</h3>
-            <p>Instagram & TikTok</p>
+            <p>Instagram, TikTok & Facebook</p>
         </div>
 
-        <div class="card" onclick="location.href='/forge/pdf'">
-            <i class="fas fa-file-pdf"></i>
-            <h3>PDF</h3>
-            <p>Έγγραφα & Menus</p>
-        </div>
-
-        <div class="card" onclick="location.href='/forge/image'">
-            <i class="fas fa-image"></i>
-            <h3>Image</h3>
-            <p>Φωτογραφίες</p>
-        </div>
-
-        <div class="card" onclick="location.href='/forge/music'">
-            <i class="fas fa-music"></i>
-            <h3>Audio</h3>
-            <p>Μουσική & MP3</p>
-        </div>
-
-        <div class="card" onclick="location.href='/forge/zip'">
-            <i class="fas fa-file-zipper"></i>
-            <h3>ZIP Archive</h3>
-            <p>Συμπιεσμένα αρχεία</p>
+        <div class="card" onclick="location.href='/forge/text'">
+            <div class="card-glow"></div>
+            <i class="fas fa-align-left"></i>
+            <h3>Rich Text</h3>
+            <p>Μορφοποιημένο Κείμενο</p>
         </div>
     </main>
 
-    <footer style="text-align: center; padding: 40px; color: var(--text-dim); font-size: 0.9rem;">
-        &copy; 2026 QRForge Premium. Crafted for Excellence.
+    <footer style="text-align: center; padding: 60px 20px; color: var(--text-dim); font-size: 0.85rem; opacity: 0.9;">
+        <p>&copy; 2026 QRForge Premium. Crafted with excellence by <strong>Konstantinos Georgoudis</strong>.</p>
+        <div class="footer-links" style="margin: 15px 0;">
+    <a href="/legal">Πολιτική Απορρήτου</a> | 
+    <a href="/legal">Όροι Χρήσης</a> | 
+    <a href="/legal">Cookies</a>
+</div>
+        </div>
+        <p style="font-size: 0.75rem; opacity: 0.6;">Stable Version 1.0 • Cloud Powered</p>
     </footer>
 
+    <div id="cookie-banner">
+        <p>Χρησιμοποιούμε cookies για να διασφαλίσουμε την καλύτερη εμπειρία πλοήγησης. <a href="/legal" style="color: var(--accent-color);">Μάθετε περισσότερα</a>.</p>
+        <div class="cookie-btns">
+            <button class="reject-btn" onclick="closeCookies()">Απόρριψη</button>
+            <button class="accept-btn" onclick="closeCookies()">Αποδοχή</button>
+        </div>
+    </div>
+
+    <script>
+        function closeCookies() {
+            document.getElementById('cookie-banner').style.display = 'none';
+            // Εδώ μπορείς να προσθέσεις localStorage.setItem αν θες να μην ξαναβγεί
+        }
+    </script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

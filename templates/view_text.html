@@ -3,129 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QRForge | Secure Content</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>QRForge | Προβολή Περιεχομένου</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
-        :root {
-            --bg-color: #020617;
-            --accent: #38bdf8;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
-            --text-main: #f1f5f9;
-            --text-dim: #94a3b8;
-        }
-
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: var(--bg-color); 
-            color: var(--text-main); 
-            display: flex; 
-            flex-direction: column;
-            align-items: center; 
+        body {
+            background: #0f172a; /* Σκούρο φόντο όπως το υπόλοιπο site */
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding: 40px 20px;
-            background-image: 
-                radial-gradient(circle at 50% -10%, rgba(56, 189, 248, 0.15) 0%, transparent 50%);
+            padding: 20px;
+        }
+        .content-card {
+            background: #1e293b;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            max-width: 600px;
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: fadeIn 0.5s ease-out;
+        }
+        .text-body {
             line-height: 1.6;
-        }
-
-        /* Branding Header */
-        .brand {
-            font-weight: 800;
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-            letter-spacing: -1px;
-            text-transform: uppercase;
-        }
-        .brand span { color: var(--accent); }
-
-        /* Η κάρτα του περιεχομένου */
-        .content-card { 
-            background: var(--glass); 
-            backdrop-filter: blur(25px); 
-            -webkit-backdrop-filter: blur(25px);
-            padding: 40px; 
-            border-radius: 32px; 
-            border: 1px solid var(--border); 
-            max-width: 650px; 
-            width: 100%; 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            word-wrap: break-word; /* Προστασία από πολύ μεγάλο κείμενο */
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Styling για το Rich Text (Quill) */
-        .content-body {
             font-size: 1.1rem;
-            color: #cbd5e1;
+            color: #e2e8f0;
         }
-
-        .content-body h1, .content-body h2, .content-body h3 { 
-            color: var(--accent); 
-            margin-top: 1.5rem; 
-            margin-bottom: 1rem;
-            line-height: 1.2;
-        }
-
-        .content-body p { margin-bottom: 1.2rem; }
-        
-        .content-body strong { color: #fff; font-weight: 700; }
-        
-        /* Διόρθωση για λίστες ώστε να φαίνονται σωστά */
-        .content-body ul, .content-body ol { 
-            padding-left: 1.5rem; 
-            margin-bottom: 1.5rem;
-            background: rgba(255,255,255,0.02);
-            border-radius: 15px;
-            padding: 20px 20px 20px 40px;
-        }
-
-        .content-body li { margin-bottom: 8px; }
-
-        .content-body img { 
-            max-width: 100%; 
-            border-radius: 20px; 
-            margin: 20px 0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        /* Footer */
-        .footer {
-            margin-top: 3rem;
-            font-size: 0.85rem;
-            color: var(--text-dim);
+        .text-body b, .text-body strong { color: var(--accent-color, #38bdf8); }
+        .footer-logo {
             text-align: center;
-            opacity: 0.8;
+            margin-top: 30px;
+            font-size: 0.8rem;
+            opacity: 0.5;
+            letter-spacing: 2px;
         }
-        
-        .footer i { color: var(--accent); margin-right: 5px; }
-
-        /* Mobile Adjustments */
-        @media (max-width: 480px) {
-            .content-card { padding: 25px; border-radius: 24px; }
-            .brand { font-size: 1.2rem; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
-    <div class="brand">QR<span>FORGE</span> Content</div>
 
     <div class="content-card">
-        <div class="content-body">
+        <div class="text-body">
             {{ content | safe }}
+        </div>
+        
+        <div class="footer-logo">
+            QR<span>FORGE</span> PREMIUM
         </div>
     </div>
 
-    <div class="footer">
-        <p><i class="fas fa-shield-alt"></i> Protected & Hosted by QRForge</p>
-        <p style="font-size: 0.7rem; margin-top: 5px;">&copy; 2026 qrforge.gr</p>
-    </div>
 </body>
 </html>
