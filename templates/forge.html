@@ -3,82 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forge | QRForge</title>
+    <title>Forge | QRForge Premium</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <style>
+        /* Διόρθωση για να φαίνονται οι επιλογές του Editor */
+        .ql-toolbar.ql-snow { background: #f1f5f9; border-radius: 12px 12px 0 0; }
+        #editor-container { background: white; color: black; border-radius: 0 0 12px 12px; min-height: 200px; }
+    </style>
 </head>
-<body>
+<body class="forge-page">
     <div class="forge-container">
         <div class="forge-panel settings">
-            <div class="panel-header" style="padding: 1.5rem 2rem; border-bottom: 1px solid var(--glass-border);">
-                <a href="/" style="color: var(--text-dim); text-decoration: none; font-size: 0.9rem;">
-                    <i class="fas fa-arrow-left"></i> Πίσω
-                </a>
-                <h2 style="margin: 10px 0 0;">Forge <span class="gradient-text">{{ qr_type.upper() }}</span></h2>
+            <div class="panel-header">
+                <a href="/" class="back-btn"><i class="fas fa-arrow-left"></i> Πίσω</a>
+                <h2>Forge <span class="gradient-text">{{ qr_type.upper() }}</span></h2>
             </div>
             
             <div class="scroll-content">
                 <div class="card-inner">
-                    <label class="section-label">1. Περιεχόμενο</label>
+                    <label class="section-label">1. Περιεχόμενο QR</label>
                     {% if qr_type == 'text' %}
-                        <div id="editor-container" style="height: 200px; background: white; color: black; border-radius: 12px;"></div>
+                        <div id="editor-container"></div>
                     {% elif qr_type in ['image', 'pdf', 'music', 'zip'] %}
-                        <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-                            <i class="fas {% if qr_type == 'zip' %}fa-file-zipper{% else %}fa-cloud-upload-alt{% endif %}" 
-                               style="font-size: 2.5rem; color: var(--accent-color); margin-bottom: 10px;"></i>
-                            <p id="upload-text">Ανεβάστε το {{ qr_type.upper() }} αρχείο σας</p>
-                            <input type="file" id="file-input" hidden accept=".pdf,.png,.jpg,.jpeg,.mp3,.zip">
+                        <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+                            <i class="fas fa-file-archive"></i>
+                            <p>Κάντε κλικ για ανέβασμα {{ qr_type.upper() }}</p>
+                            <input type="file" id="file-input" hidden>
                         </div>
-                        <p id="file-status" style="font-size: 0.8rem; margin-top: 10px; color: var(--accent-color); text-align: center;"></p>
                     {% else %}
-                        <input type="text" id="qr-data" placeholder="Επικολλήστε το link εδώ...">
+                        <input type="text" id="qr-data" class="premium-input" placeholder="Εισάγετε το link ή το username...">
                     {% endif %}
                 </div>
 
+                {% if qr_type == 'social' %}
                 <div class="card-inner">
-                    <label class="section-label">2. Σχεδίαση</label>
-                    <div class="control-row">
-                        <div class="color-picker-wrapper">
-                            <label style="font-size: 0.7rem; display: block; margin-bottom: 5px;">Χρώμα QR</label>
-                            <input type="color" id="dot-color" value="#0ea5e9">
-                        </div>
-                        <div class="color-picker-wrapper">
-                            <label style="font-size: 0.7rem; display: block; margin-bottom: 5px;">Φόντο</label>
-                            <input type="color" id="bg-color-input" value="#ffffff">
-                        </div>
+                    <label class="section-label">2. Επιλέξτε Δίκτυο</label>
+                    <div class="logo-grid">
+                        <button class="logo-opt" onclick="setQRLogo('instagram')"><i class="fab fa-instagram"></i></button>
+                        <button class="logo-opt" onclick="setQRLogo('tiktok')"><i class="fab fa-tiktok"></i></button>
+                        <button class="logo-opt" onclick="setQRLogo('youtube')"><i class="fab fa-youtube"></i></button>
+                        <button class="logo-opt" onclick="setQRLogo('whatsapp')"><i class="fab fa-whatsapp"></i></button>
+                        <button class="logo-opt" onclick="setQRLogo('facebook')"><i class="fab fa-facebook"></i></button>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="card-inner">
+                    <label class="section-label">{% if qr_type == 'social' %}3{% else %}2{% endif %}. Custom Logo στο Κέντρο</label>
+                    <div class="upload-zone" style="padding: 15px;" onclick="document.getElementById('user-logo').click()">
+                        <i class="fas fa-image" style="font-size: 1.2rem;"></i>
+                        <p style="font-size: 0.8rem;">Ανεβάστε δικό σας Logo (PNG/JPG)</p>
+                        <input type="file" id="user-logo" hidden accept="image/*">
                     </div>
                 </div>
 
                 <div class="card-inner">
-                    <label class="section-label">3. Στυλ & Logo</label>
-                    <select id="dot-style" style="margin-bottom: 15px;">
-                        <option value="rounded">Rounded</option>
-                        <option value="dots">Dots</option>
-                        <option value="square">Square</option>
-                    </option>
-
-                    <div class="logo-grid">
-                        <button class="logo-opt active" onclick="setQRLogo('')">None</button>
-                        <button class="logo-opt" onclick="setQRLogo('instagram')">Instagram</button>
-                        <button class="logo-opt" onclick="setQRLogo('tiktok')">TikTok</button>
+                    <label class="section-label">Σχεδίαση QR</label>
+                    <div class="control-row">
+                        <div class="color-picker-wrapper">
+                            <label>Χρώμα QR</label>
+                            <input type="color" id="dot-color" value="#38bdf8">
+                        </div>
+                        <div class="color-picker-wrapper">
+                            <label>Φόντο</label>
+                            <input type="color" id="bg-color-input" value="#ffffff">
+                        </div>
                     </div>
+                    <label style="margin-top: 15px; display: block; font-size: 0.8rem;">Στυλ Τελείας</label>
+                    <select id="dot-style" class="premium-select">
+                        <option value="rounded">Στρογγυλεμένα</option>
+                        <option value="dots">Κύκλοι</option>
+                        <option value="square">Τετράγωνα</option>
+                        <option value="classy">Classy</option>
+                    </select>
                 </div>
             </div>
         </div>
 
         <div class="forge-panel preview">
-            <div id="canvas-container">
-                <div id="qrcode"></div>
+            <div class="preview-sticky">
+                <div id="canvas-container">
+                    <div id="qrcode"></div>
+                </div>
+                <button class="download-btn">
+                    <i class="fas fa-download"></i> DOWNLOAD PNG
+                </button>
             </div>
-            <button class="download-btn">
-                <i class="fas fa-download"></i> DOWNLOAD PNG
-            </button>
         </div>
     </div>
 
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+    
+    <script>
+        // Αρχικοποίηση Quill Editor με πλήρες Toolbar
+        if (document.getElementById('editor-container')) {
+            var quill = new Quill('#editor-container', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['clean']
+                    ]
+                }
+            });
+        }
+    </script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
