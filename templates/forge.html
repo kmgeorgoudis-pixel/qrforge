@@ -114,5 +114,49 @@
         }
     </script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+    // Λειτουργία για την αλλαγή Logo (Social & Custom)
+    function setQRLogo(type) {
+        let logoUrl = '';
+        const logos = {
+            'instagram': 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg',
+            'tiktok': 'https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg',
+            'youtube': 'https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg',
+            'whatsapp': 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
+            'facebook': 'https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg'
+        };
+        
+        logoUrl = logos[type] || '';
+        
+        // Ενημέρωση του QR Code (Προϋποθέτει ότι το qrCode object υπάρχει στο main.js)
+        if (window.qrCode) {
+            window.qrCode.update({
+                image: logoUrl,
+                imageOptions: { hideBackgroundDots: true, imageSize: 0.4, margin: 5 }
+            });
+        }
+        
+        // Active Class στα buttons
+        document.querySelectorAll('.logo-opt').forEach(btn => btn.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+    }
+
+    // Ανέβασμα Custom Logo από τον χρήστη
+    document.getElementById('user-logo').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                if (window.qrCode) {
+                    window.qrCode.update({
+                        image: event.target.result,
+                        imageOptions: { hideBackgroundDots: true, imageSize: 0.4, margin: 5 }
+                    });
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
 </body>
 </html>

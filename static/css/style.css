@@ -114,3 +114,63 @@ input[type="color"] { width: 100%; height: 30px; border: none; cursor: pointer; 
 .logo-grid { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
 .logo-opt { background: #0f172a; border: 1px solid var(--glass-border); color: white; padding: 10px 15px; border-radius: 10px; cursor: pointer; }
 .logo-opt.active { background: var(--accent-color); color: #000; }
+/* Διόρθωση Layout για να είναι δίπλα-δίπλα */
+.forge-container {
+    display: flex !important;
+    flex-direction: row !important; /* Αναγκάζει τα panels να είναι δίπλα-δίπλα */
+    align-items: flex-start;
+    gap: 2rem;
+    max-width: 1300px;
+    margin: 0 auto;
+    height: calc(100vh - 100px);
+}
+
+.forge-panel.settings {
+    flex: 1.5;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.forge-panel.preview {
+    flex: 1;
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+    padding: 3rem 2rem;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Εξασφάλιση ότι το QR φαίνεται άσπρο και καθαρό */
+#canvas-container {
+    background: white !important;
+    padding: 20px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+#qrcode canvas {
+    max-width: 100%;
+    height: auto !important;
+}
+
+/* Media Query για κινητά - Μόνο εκεί θα πηγαίνει το ένα κάτω από το άλλο */
+@media (max-width: 900px) {
+    .forge-container {
+        flex-direction: column !important;
+        height: auto;
+    }
+    .forge-panel.preview {
+        position: relative;
+        top: 0;
+        width: 100%;
+    }
+}
