@@ -10,8 +10,10 @@ app = Flask(__name__)
 # Δοκιμάζουμε χωρίς SSL verification και με άμεσο string
 MONGO_URI = "mongodb+srv://kmgeorgoudis_db_user:LKcu5a70s2zTeidM@cluster0.63qtir3.mongodb.net/qrforge?retryWrites=true&w=majority"
 
+# --- ΣΥΝΔΕΣΗ ΜΕ MONGO DB ATLAS (Direct Mode) ---
+MONGO_URI = "mongodb://kmgeorgoudis_db_user:LKcu5a70s2zTeidM@ac-uogfoiv-shard-00-00.63qtir3.mongodb.net:27017,ac-uogfoiv-shard-00-01.63qtir3.mongodb.net:27017,ac-uogfoiv-shard-00-02.63qtir3.mongodb.net:27017/qrforge?ssl=true&replicaSet=atlas-m9v3v1-shard-0&authSource=admin&retryWrites=true&w=majority"
+
 try:
-    # Αφαιρούμε το certifi και βάζουμε tlsAllowInvalidCertificates
     client = MongoClient(
         MONGO_URI,
         tls=True,
@@ -20,7 +22,7 @@ try:
     db = client.get_database("qrforge")
     texts_collection = db.texts
     
-    # Force σύνδεση
+    # Force ping
     client.admin.command('ping')
     print("✅ Επιτυχής σύνδεση στη MongoDB Atlas!")
 except Exception as e:
