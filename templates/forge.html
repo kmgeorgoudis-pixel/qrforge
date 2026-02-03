@@ -6,112 +6,108 @@
     <title>Forge | QRForge Premium</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        /* Διόρθωση για να φαίνεται το QR στα πλάγια με το νέο λευκό στυλ */
-        body {
-            background: #f0f2f5;
-            color: #1e293b;
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-        }
+  <style>
+    body {
+        background: #f0f2f5;
+        color: #1e293b;
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        /* Επιτρέπει το scroll σε όλη τη σελίδα */
+        overflow-y: auto !important; 
+        min-height: 100vh;
+    }
 
-        .forge-container {
-            display: grid;
-            grid-template-columns: 1fr 450px; /* Σταθερό πλάτος για το Preview */
-            gap: 30px;
-            max-width: 1200px;
-            margin: 100px auto 40px;
-            padding: 20px;
-            align-items: start;
-        }
+    .forge-container {
+        display: grid;
+        grid-template-columns: 1fr 450px;
+        gap: 30px;
+        max-width: 1200px;
+        margin: 100px auto 100px; /* Περισσότερο περιθώριο κάτω για άνετο scroll */
+        padding: 20px;
+        align-items: start;
+        height: auto; /* Απελευθέρωση ύψους */
+    }
 
-        .forge-panel.settings {
-            background: white;
-            padding: 30px;
-            border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        }
+    .forge-panel.settings {
+        background: white;
+        padding: 30px;
+        border-radius: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        /* Αφαιρούμε τυχόν εσωτερικά scrollbars που μπλοκάρουν το ποντίκι */
+        overflow: visible; 
+    }
 
-        .forge-panel.preview {
-            position: sticky;
-            top: 100px;
-            background: white;
-            padding: 40px;
-            border-radius: 30px;
-            box-shadow: 0 20px 50px rgba(99, 102, 241, 0.15);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border: 2px solid #fff;
-        }
+    .forge-panel.preview {
+        position: sticky;
+        top: 120px; /* Απόσταση από την κορυφή κατά το scroll */
+        background: white;
+        padding: 40px;
+        border-radius: 30px;
+        box-shadow: 0 20px 50px rgba(99, 102, 241, 0.15);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 2px solid #fff;
+        z-index: 10;
+    }
 
-        /* Styling για τα Inputs μέσα στο λευκό φόντο */
-        .premium-input, select {
-            background: #f8fafc !important;
-            border: 2px solid #e2e8f0 !important;
-            color: #1e293b !important;
-            padding: 12px !important;
-            border-radius: 12px !important;
-            width: 100%;
-            margin-top: 8px;
-        }
+    /* Styling για τα Inputs */
+    .premium-input, select {
+        background: #f8fafc !important;
+        border: 2px solid #e2e8f0 !important;
+        color: #1e293b !important;
+        padding: 12px !important;
+        border-radius: 12px !important;
+        width: 100%;
+        margin-top: 8px;
+    }
 
-        .section-label {
-            font-weight: 800;
-            color: #0f172a;
-            display: block;
-            margin-top: 20px;
-        }
+    .section-label {
+        font-weight: 800;
+        color: #0f172a;
+        display: block;
+        margin-top: 25px;
+    }
 
-        #qrcode {
-            padding: 15px;
-            background: white;
-            border-radius: 20px;
-        }
+    #qrcode {
+        padding: 15px;
+        background: white;
+        border-radius: 20px;
+    }
 
-        .download-btn {
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 20px;
-            transition: transform 0.2s;
-        }
+    .download-btn {
+        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 15px;
+        font-weight: bold;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 20px;
+        transition: transform 0.2s;
+    }
 
-        .download-btn:hover { transform: scale(1.02); }
+    .logo-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        margin-top: 10px;
+    }
 
-        .logo-opt {
-            background: #f1f5f9;
-            border: 2px solid transparent;
-            padding: 15px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1.5rem;
-            color: #6366f1;
-            transition: all 0.2s;
+    @media (max-width: 900px) {
+        .forge-container { 
+            grid-template-columns: 1fr; 
+            margin-top: 80px; 
         }
-
-        .logo-opt.active {
-            border-color: #6366f1;
-            background: #eef2ff;
+        .forge-panel.preview { 
+            position: relative; /* Όχι sticky σε κινητά */
+            top: 0;
+            order: -1; 
+            margin-bottom: 20px;
         }
-
-        .logo-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        @media (max-width: 900px) {
-            .forge-container { grid-template-columns: 1fr; margin-top: 80px; }
-            .forge-panel.preview { position: static; order: -1; }
-        }
-    </style>
+    }
+</style>
 </head>
 <body class="forge-page">
 
