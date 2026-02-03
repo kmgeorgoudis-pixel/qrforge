@@ -1,6 +1,6 @@
 /**
  * QRForge - Generator Logic (Stable Edition)
- * Clean version: No MongoDB, No SSL errors.
+ * Updated: Local TikTok Logo Support
  */
 document.addEventListener("DOMContentLoaded", () => {
     const qrElement = document.getElementById("qrcode");
@@ -11,10 +11,10 @@ document.addEventListener("DOMContentLoaded", () => {
         width: 300,
         height: 300,
         type: "svg",
-        data: "https://qrforge.gr",
+        data: "https://qrforge-n7ol.onrender.com/",
         image: "", 
         dotsOptions: {
-            color: "#38bdf8",
+            color: "#6366f1",
             type: "rounded"
         },
         backgroundOptions: {
@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
             crossOrigin: "anonymous",
             margin: 5,
             hideBackgroundDots: true,
-            imageSize: 0.4
+            imageSize: 0.4 // Μέγεθος λογοτύπου (0.4 = 40% του QR)
         }
     });
 
@@ -34,14 +34,22 @@ document.addEventListener("DOMContentLoaded", () => {
     window.setQRLogo = function(type, element) {
         const logos = {
             'instagram': 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg',
-            'tiktok': 'https://cdn.pixabay.com/photo/2021/06/15/12/28/tiktok-6338429_1280.png',
+            // ΑΛΛΑΓΗ ΕΔΩ: Χρήση τοπικού αρχείου για το TikTok
+            'tiktok': '/static/img/tiktok.png',
             'youtube': 'https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg',
             'whatsapp': 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
             'facebook': 'https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg'
         };
         
         const logoUrl = logos[type] || "";
-        qrCode.update({ image: logoUrl });
+        
+        // Ενημέρωση του QR με το επιλεγμένο λογότυπο
+        qrCode.update({ 
+            image: logoUrl,
+            imageOptions: {
+                imageSize: 0.4 // Επαναφορά μεγέθους για να είναι σίγουρα σωστό
+            }
+        });
 
         // UI Update: Active state στα εικονίδια
         document.querySelectorAll('.logo-opt').forEach(btn => btn.classList.remove('active'));
@@ -77,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const standardInput = document.getElementById("qr-data");
     if (standardInput) {
         standardInput.addEventListener("input", (e) => {
-            qrCode.update({ data: e.target.value || "https://qrforge.gr" });
+            qrCode.update({ data: e.target.value || "https://qrforge-n7ol.onrender.com/" });
         });
     }
 

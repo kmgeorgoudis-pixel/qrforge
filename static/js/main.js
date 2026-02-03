@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (qrInput) {
         qrInput.addEventListener("input", (e) => {
             // Ενημέρωση QR καθώς γράφει ο χρήστης
-            qrCode.update({ data: e.target.value || "https://qrforge.gr" });
+            qrCode.update({ data: e.target.value || "https://qrforge-n7ol.onrender.com/" });
         });
     }
 
