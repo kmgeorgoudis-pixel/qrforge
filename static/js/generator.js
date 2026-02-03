@@ -1,5 +1,6 @@
 /**
- * QRForge - Generator Logic (MongoDB Atlas Edition)
+ * QRForge - Generator Logic (Stable Edition)
+ * Clean version: No MongoDB, No SSL errors.
  */
 document.addEventListener("DOMContentLoaded", () => {
     const qrElement = document.getElementById("qrcode");
@@ -49,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // --- 2.1 ΣΥΝΔΕΣΗ ΤΩΝ CLICKS ΣΤΑ SOCIAL BUTTONS (Η ΔΙΟΡΘΩΣΗ) ---
+    // --- 2.1 ΣΥΝΔΕΣΗ ΤΩΝ CLICKS ΣΤΑ SOCIAL BUTTONS ---
     document.querySelectorAll('.logo-opt').forEach(button => {
         button.addEventListener('click', function() {
             const socialType = this.getAttribute('data-social');
@@ -72,32 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- 4. RICH TEXT EDITOR (QUILL) -> MONGODB ---
-    if (typeof quill !== 'undefined' && quill !== null) {
-        let typingTimer;
-        quill.on('text-change', () => {
-            clearTimeout(typingTimer);
-            typingTimer = setTimeout(() => {
-                const fullHTML = quill.root.innerHTML;
-                if (quill.getText().trim().length === 0) return;
-
-                fetch('/save-text', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content: fullHTML })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.url) {
-                        qrCode.update({ data: data.url });
-                    }
-                })
-                .catch(err => console.error("Error saving to MongoDB:", err));
-            }, 1200);
-        });
-    }
-
-    // --- 5. ΑΠΛΟ INPUT (URL / SOCIAL) ---
+    // --- 4. ΑΠΛΟ INPUT (URL / SOCIAL) ---
     const standardInput = document.getElementById("qr-data");
     if (standardInput) {
         standardInput.addEventListener("input", (e) => {
@@ -105,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- 6. ΡΥΘΜΙΣΕΙΣ ΧΡΩΜΑΤΩΝ ΚΑΙ ΣΤΥΛ ---
+    // --- 5. ΡΥΘΜΙΣΕΙΣ ΧΡΩΜΑΤΩΝ ΚΑΙ ΣΤΥΛ ---
     const dotColorPicker = document.getElementById("dot-color");
     if (dotColorPicker) {
         dotColorPicker.addEventListener("input", (e) => {
@@ -127,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- 7. DOWNLOAD ---
+    // --- 6. DOWNLOAD ---
     const downloadBtn = document.getElementById("download-btn") || document.querySelector(".download-btn");
     if (downloadBtn) {
         downloadBtn.addEventListener("click", () => {

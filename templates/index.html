@@ -7,116 +7,233 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --primary-grad: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            --glass: rgba(255, 255, 255, 0.8);
+        }
+
+        body {
+            overflow-x: hidden;
+            background: #f0f2f5; /* Ανοιχτό γκρι-μπλε φόντο */
+            color: #1e293b;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Πολύχρωμο Κινούμενο Background */
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 0% 0%, #e0e7ff 0%, #fdf2f8 100%);
+        }
+
+        nav {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .logo { color: #1e293b !important; }
+        .logo span { background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .hero { padding: 100px 20px 40px; }
+        .hero h1 {
+            font-size: 4rem;
+            color: #0f172a;
+            font-weight: 900;
+            line-height: 1.1;
+        }
+
+        .gradient-text {
+            background: var(--primary-grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
         .grid-container {
             max-width: 1000px;
             margin: 40px auto;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 30px;
             padding: 20px;
-            justify-content: center;
         }
 
-        /* Cookie Banner Style */
-        #cookie-banner {
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 2px solid white;
+            border-radius: 30px;
+            padding: 50px 30px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(99, 102, 241, 0.2);
+            border-color: #6366f1;
+        }
+
+        .card i {
+            font-size: 4.5rem;
+            background: var(--primary-grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 25px;
+            filter: drop-shadow(0 10px 15px rgba(99, 102, 241, 0.3));
+        }
+
+        .card h3 {
+            font-size: 2rem;
+            color: #1e293b;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .card p {
+            color: #64748b;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* Floating Blobs Animation */
+        .blob {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #1e293b;
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 9999;
-            border-top: 2px solid var(--accent-color);
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
-            font-size: 0.9rem;
+            width: 500px; height: 500px;
+            background: var(--primary-grad);
+            filter: blur(80px);
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0.15;
+            animation: move 20s infinite alternate;
         }
-        .cookie-btns button {
-            padding: 8px 20px;
-            margin-left: 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            border: none;
-            font-weight: bold;
-        }
-        .accept-btn { background: var(--accent-color); color: white; }
-        .reject-btn { background: transparent; border: 1px solid #475569 !important; color: #94a3b8; }
 
-        .footer-links a {
-            color: var(--text-dim);
-            text-decoration: none;
-            margin: 0 10px;
-            transition: color 0.3s;
+        @keyframes move {
+            from { transform: translate(-10%, -10%); }
+            to { transform: translate(20%, 20%); }
         }
-        .footer-links a:hover { color: var(--accent-color); }
 
-        @media (max-width: 600px) {
-            .grid-container { grid-template-columns: 1fr; }
-            #cookie-banner { flex-direction: column; text-align: center; gap: 15px; }
+        #cookie-banner {
+            background: white;
+            color: #1e293b;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+            border-top: none;
+        }
+
+        .accept-btn {
+            background: var(--primary-grad) !important;
+            border-radius: 50px !important;
+            padding: 12px 30px !important;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        footer {
+            background: white;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            color: #64748b !important;
         }
     </style>
 </head>
 <body>
+    <div class="blob"></div>
+    <div class="blob" style="right: 0; bottom: 0; animation-delay: -5s;"></div>
+    <canvas id="bg-canvas"></canvas>
+
     <nav>
         <div class="logo">QR<span>FORGE</span></div>
     </nav>
 
     <header class="hero">
-        <h1>Τι θέλεις να <span class="gradient-text">σφυρηλατήσεις</span> σήμερα;</h1>
-        <p>Δημιουργήστε μοναδικά QR Codes με premium αισθητική και απόλυτη αξιοπιστία.</p>
+        <h1 class="animate-text">Unleash Your <br><span class="gradient-text">Digital Power</span></h1>
+        <p style="font-size: 1.3rem; max-width: 700px; margin: 25px auto; color: #475569; font-weight: 500;">
+            Σφυρηλατήστε πανίσχυρα QR Codes με την πιο σύγχρονη, ταχύτατη και 
+            απόλυτα ασφαλή γεννήτρια.
+        </p>
     </header>
 
     <main class="grid-container">
         <div class="card" onclick="location.href='/forge/url'">
-            <div class="card-glow"></div>
             <i class="fas fa-link"></i>
-            <h3>URL</h3>
-            <p>Links & Ιστοσελίδες</p>
+            <h3>Dynamic URL</h3>
+            <p>Μετατρέψτε οποιοδήποτε link σε ένα κομψό QR Code μέσα σε δευτερόλεπτα.</p>
         </div>
 
         <div class="card" onclick="location.href='/forge/social'">
-            <div class="card-glow"></div>
             <i class="fas fa-share-nodes"></i>
-            <h3>Social Media</h3>
-            <p>Instagram, TikTok & Facebook</p>
-        </div>
-
-        <div class="card" onclick="location.href='/forge/text'">
-            <div class="card-glow"></div>
-            <i class="fas fa-align-left"></i>
-            <h3>Rich Text</h3>
-            <p>Μορφοποιημένο Κείμενο</p>
+            <h3>Social Hub</h3>
+            <p>Συνδέστε το Instagram, το TikTok και το YouTube σας με ένα μόνο σκανάρισμα.</p>
         </div>
     </main>
 
-    <footer style="text-align: center; padding: 60px 20px; color: var(--text-dim); font-size: 0.85rem; opacity: 0.9;">
-        <p>&copy; 2026 QRForge Premium. Crafted with excellence by <strong>Konstantinos Georgoudis</strong>.</p>
-        <div class="footer-links" style="margin: 15px 0;">
-    <a href="/legal">Πολιτική Απορρήτου</a> | 
-    <a href="/legal">Όροι Χρήσης</a> | 
-    <a href="/legal">Cookies</a>
-</div>
+    <footer style="text-align: center; padding: 60px 20px;">
+        <p>&copy; 2026 QRForge Premium. Crafted with ❤️ by <strong>Konstantinos Georgoudis</strong>.</p>
+        <div class="footer-links" style="margin: 20px 0;">
+            <a href="/legal" style="color:#6366f1">Privacy Policy</a> | 
+            <a href="/legal" style="color:#6366f1">Terms of Service</a>
         </div>
-        <p style="font-size: 0.75rem; opacity: 0.6;">Stable Version 1.0 • Cloud Powered</p>
+        <p style="font-size: 0.8rem; opacity: 0.5;">Stable Version 2.0 • Serverless Core</p>
     </footer>
 
     <div id="cookie-banner">
-        <p>Χρησιμοποιούμε cookies για να διασφαλίσουμε την καλύτερη εμπειρία πλοήγησης. <a href="/legal" style="color: var(--accent-color);">Μάθετε περισσότερα</a>.</p>
+        <p><i class="fas fa-cookie-bite" style="color: #f59e0b"></i> Χρησιμοποιούμε cookies για να σας προσφέρουμε την καλύτερη εμπειρία. <a href="/legal">Μάθετε περισσότερα</a>.</p>
         <div class="cookie-btns">
-            <button class="reject-btn" onclick="closeCookies()">Απόρριψη</button>
-            <button class="accept-btn" onclick="closeCookies()">Αποδοχή</button>
+            <button class="accept-btn" onclick="closeCookies()">ΕΓΙΝΕ!</button>
         </div>
     </div>
 
     <script>
+        // Smooth Cookie Closure
         function closeCookies() {
-            document.getElementById('cookie-banner').style.display = 'none';
-            // Εδώ μπορείς να προσθέσεις localStorage.setItem αν θες να μην ξαναβγεί
+            const banner = document.getElementById('cookie-banner');
+            banner.style.transform = 'translateY(100%)';
+            banner.style.transition = '0.5s ease-in-out';
+            setTimeout(() => banner.style.display = 'none', 500);
         }
+
+        // Particle Canvas Background
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let dots = [];
+
+        function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            dots = [];
+            for(let i=0; i<40; i++) {
+                dots.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 4 + 1,
+                    dx: (Math.random() - 0.5) * 0.5,
+                    dy: (Math.random() - 0.5) * 0.5
+                });
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(99, 102, 241, 0.2)';
+            dots.forEach(d => {
+                ctx.beginPath();
+                ctx.arc(d.x, d.y, d.r, 0, Math.PI*2);
+                ctx.fill();
+                d.x += d.dx; d.y += d.dy;
+                if(d.x < 0 || d.x > canvas.width) d.dx *= -1;
+                if(d.y < 0 || d.y > canvas.height) d.dy *= -1;
+            });
+            requestAnimationFrame(draw);
+        }
+
+        init();
+        draw();
+        window.onresize = init;
     </script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

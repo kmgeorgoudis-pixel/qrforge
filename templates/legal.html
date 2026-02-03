@@ -5,13 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Νομικές Πληροφορίες | QRForge</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #0f172a; color: #f8fafc; line-height: 1.7; }
-        .legal-container { max-width: 800px; margin: 60px auto; padding: 40px; background: #1e293b; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h1 { color: var(--accent-color); margin-bottom: 30px; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        body { background: #0f172a; color: #f8fafc; line-height: 1.7; font-family: sans-serif; }
+        .legal-container { max-width: 800px; margin: 60px auto; padding: 40px; background: #1e293b; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #334155; }
+        h1 { color: var(--accent-color); margin-bottom: 30px; border-bottom: 1px solid #334155; padding-bottom: 10px; font-size: 1.8rem; }
         h2 { color: #38bdf8; margin-top: 30px; font-size: 1.3rem; }
         p, li { color: #94a3b8; font-size: 0.95rem; }
-        .back-home { display: inline-block; margin-bottom: 20px; color: var(--accent-color); text-decoration: none; font-weight: bold; }
+        ul { padding-left: 20px; }
+        .back-home { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; color: var(--accent-color); text-decoration: none; font-weight: bold; transition: opacity 0.3s; }
+        .back-home:hover { opacity: 0.8; }
+        strong { color: #f8fafc; }
     </style>
 </head>
 <body>
@@ -20,26 +24,26 @@
         
         <h1>Πολιτική Απορρήτου & Cookies</h1>
         
-        <p>Η εφαρμογή <strong>QRForge</strong>, δημιουργία του <strong>Κωνσταντίνου Γεωργούδη</strong>, δίνει προτεραιότητα στην προστασία των δεδομένων σας.</p>
+        <p>Η εφαρμογή <strong>QRForge</strong>, δημιουργία του <strong>Κωνσταντίνου Γεωργούδη</strong>, προσφέρει ένα απόλυτα ασφαλές περιβάλλον δημιουργίας QR Codes, χωρίς την ανάγκη συλλογής προσωπικών δεδομένων.</p>
 
-        <h2>1. Συλλογή Δεδομένων</h2>
-        <p>Συλλέγουμε μόνο τις πληροφορίες που εσείς εισάγετε εθελοντικά:</p>
+        <h2>1. Συλλογή & Επεξεργασία Δεδομένων</h2>
+        <p>Η εφαρμογή λειτουργεί με την αρχή του <strong>Privacy by Design</strong>:</p>
         <ul>
-            <li><strong>Rich Text:</strong> Το περιεχόμενο αποθηκεύεται με ασφάλεια σε βάση δεδομένων (MongoDB) για να είναι προσβάσιμο μέσω του QR Code.</li>
-            <li><strong>URLs/Social Media:</strong> Δεν αποθηκεύονται στον server μας, ενσωματώνονται απευθείας στο QR Code σας.</li>
+            <li><strong>URLs & Social Media:</strong> Οι πληροφορίες που εισάγετε (σύνδεσμοι, usernames) <strong>δεν αποθηκεύονται</strong> σε καμία βάση δεδομένων και σε κανέναν server. Η επεξεργασία γίνεται τοπικά στον περιηγητή σας (client-side) και ενσωματώνεται απευθείας στο QR Code.</li>
+            <li><strong>Προσωπικά Δεδομένα:</strong> Δεν απαιτείται εγγραφή, σύνδεση ή παροχή email για τη χρήση της εφαρμογής.</li>
         </ul>
 
         <h2>2. Cookies</h2>
-        <p>Χρησιμοποιούμε cookies μόνο για τη βασική λειτουργία της ιστοσελίδας και τη βελτίωση της εμπειρίας χρήστη. Δεν χρησιμοποιούμε cookies για διαφημιστικούς σκοπούς ή παρακολούθηση (tracking).</p>
+        <p>Χρησιμοποιούμε cookies μόνο για τη διασφάλιση της βασικής λειτουργίας της ιστοσελίδας. Δεν χρησιμοποιούμε cookies τρίτων μερών (third-party cookies) για διαφήμιση, παρακολούθηση (tracking) ή ανάλυση συμπεριφοράς.</p>
 
         <h2>3. Ασφάλεια</h2>
-        <p>Τα δεδομένα σας αποθηκεύονται σε cloud servers με σύγχρονα πρωτόκολλα κρυπτογράφησης. Η πρόσβαση στα δεδομένα περιορίζεται αποκλειστικά για την προβολή του περιεχομένου μέσω των QR codes που δημιουργείτε.</p>
+        <p>Παρόλο που δεν αποθηκεύουμε δεδομένα, η σύνδεση με την εφαρμογή προστατεύεται από πρωτόκολλο κρυπτογράφησης <strong>SSL/TLS</strong>, διασφαλίζοντας ότι η περιήγησή σας είναι ιδιωτική και ασφαλής.</p>
 
-        <h2>4. Επικοινωνία</h2>
-        <p>Για οποιαδήποτε απορία σχετικά με τα δεδομένα σας, μπορείτε να επικοινωνήσετε με τον δημιουργό της εφαρμογής, Κωνσταντίνο Γεωργούδη.</p>
+        <h2>4. Πνευματική Ιδιοκτησία</h2>
+        <p>Ο σχεδιασμός και ο κώδικας της εφαρμογής αποτελούν πνευματική ιδιοκτησία του δημιουργού. Η χρήση των παραγόμενων QR Codes είναι ελεύθερη για προσωπική και επαγγελματική χρήση.</p>
 
-        <footer style="margin-top: 50px; border-top: 1px solid #334155; padding-top: 20px; font-size: 0.8rem; text-align: center;">
-            Τελευταία ενημέρωση: Φεβρουάριος 2026
+        <footer style="margin-top: 50px; border-top: 1px solid #334155; padding-top: 20px; font-size: 0.8rem; text-align: center; color: #64748b;">
+            Τελευταία ενημέρωση: Φεβρουάριος 2026 • QRForge Stable Version
         </footer>
     </div>
 </body>

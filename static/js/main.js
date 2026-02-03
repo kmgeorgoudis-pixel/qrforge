@@ -1,9 +1,9 @@
-/**
- * QRForge - Main Logic (Cloud Edition)
- * Σύνδεση QR Styling, Quill Editor και MongoDB Atlas
+=/**
+ * QRForge - Main Logic (Clean Edition)
+ * Χωρίς MongoDB - Μόνο URL & Social QR Generation
  */
 
-// 1. Καθολική Αρχικοποίηση QR Code
+// 1. Καθολική Αρχικοποίηση QR Code Styling
 const qrCode = new QRCodeStyling({
     width: 300,
     height: 300,
@@ -44,14 +44,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const logoUrl = logos[type] || "";
         qrCode.update({ image: logoUrl });
 
-        // UI Update: Active state
+        // UI Update: Active state για τα κουμπιά
         document.querySelectorAll('.logo-opt').forEach(btn => btn.classList.remove('active'));
         if (element) {
             element.classList.add('active');
         }
     };
 
-    // --- 2.1 ΣΥΝΔΕΣΗ CLICKS ΣΤΑ SOCIAL BUTTONS (Η ΔΙΟΡΘΩΣΗ) ---
+    // Σύνδεση clicks στα Social Buttons
     document.querySelectorAll('.logo-opt').forEach(button => {
         button.addEventListener('click', function() {
             const socialType = this.getAttribute('data-social');
@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // --- 3. CUSTOM LOGO UPLOAD ---
+    // --- 3. CUSTOM LOGO UPLOAD (Από τον χρήστη) ---
     const userLogoInput = document.getElementById("user-logo");
     if (userLogoInput) {
         userLogoInput.addEventListener("change", function(e) {
@@ -74,49 +74,16 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- 4. URL & SOCIAL INPUTS ---
+    // --- 4. URL INPUT ---
     const qrInput = document.getElementById("qr-data");
     if (qrInput) {
         qrInput.addEventListener("input", (e) => {
+            // Ενημέρωση QR καθώς γράφει ο χρήστης
             qrCode.update({ data: e.target.value || "https://qrforge.gr" });
         });
     }
 
-    // --- 5. RICH TEXT SAVE (MONGODB) ---
-    const saveTextBtn = document.getElementById("save-text-btn");
-    if (saveTextBtn && typeof quill !== 'undefined') {
-        saveTextBtn.addEventListener("click", () => {
-            const htmlContent = quill.root.innerHTML;
-            
-            saveTextBtn.innerText = "ΑΠΟΘΗΚΕΥΣΗ...";
-            saveTextBtn.disabled = true;
-
-            fetch('/save-text', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ content: htmlContent })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.url) {
-                    qrCode.update({ data: data.url });
-                    saveTextBtn.innerText = "ΕΠΙΤΥΧΙΑ! ✅";
-                    saveTextBtn.style.background = "#22c55e";
-                } else {
-                    alert("Σφάλμα κατά την αποθήκευση.");
-                    saveTextBtn.innerText = "ΔΟΚΙΜΑΣΤΕ ΞΑΝΑ";
-                    saveTextBtn.disabled = false;
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                saveTextBtn.innerText = "ΣΦΑΛΜΑ ΣΥΝΔΕΣΗΣ";
-                saveTextBtn.disabled = false;
-            });
-        });
-    }
-
-    // --- 6. STYLE CONTROLS ---
+    // --- 5. STYLE CONTROLS (Χρώματα & Σχήματα) ---
     const dotColor = document.getElementById("dot-color");
     if (dotColor) {
         dotColor.addEventListener("input", (e) => {
@@ -138,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- 7. DOWNLOAD ---
+    // --- 6. DOWNLOAD PNG ---
     const downloadBtn = document.getElementById("download-btn");
     if (downloadBtn) {
         downloadBtn.addEventListener("click", () => {
