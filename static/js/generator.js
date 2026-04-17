@@ -1,17 +1,17 @@
 /**
- * QRForge - Generator Logic (Stable Edition)
- * Updated: Support for Text Forge & Local TikTok Logo
+ * QRForge - Generator Logic (Final Stable Edition)
+ * Includes: URL/Social Support & Base64 Text Viewer
  */
 document.addEventListener("DOMContentLoaded", () => {
     const qrElement = document.getElementById("qrcode");
     if (!qrElement) return;
 
-    // 1. Αρχικοποίηση QR Code με premium ρυθμίσεις
+    // 1. Αρχικοποίηση QR Code
     const qrCode = new QRCodeStyling({
         width: 300,
         height: 300,
         type: "svg",
-        data: "QRForge", // Αρχικό κείμενο
+        data: "QRForge",
         image: "", 
         dotsOptions: {
             color: "#6366f1",
@@ -30,113 +30,84 @@ document.addEventListener("DOMContentLoaded", () => {
 
     qrCode.append(qrElement);
 
-    // --- 2. ΛΕΙΤΟΥΡΓΙΑ SOCIAL LOGO SELECTION ---
+    // --- 2. SOCIAL LOGO SELECTION ---
     window.setQRLogo = function(type, element) {
         const logos = {
             'instagram': 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg',
-            'tiktok': '/static/img/tiktok.png', // Τοπικό αρχείο
+            'tiktok': '/static/img/tiktok.png',
             'youtube': 'https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg',
             'whatsapp': 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
             'facebook': 'https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg'
         };
         
         const logoUrl = logos[type] || "";
-        
-        qrCode.update({ 
-            image: logoUrl,
-            imageOptions: {
-                imageSize: 0.4 
-            }
-        });
+        qrCode.update({ image: logoUrl });
 
         document.querySelectorAll('.logo-opt').forEach(btn => btn.classList.remove('active'));
-        if (element) {
-            element.classList.add('active');
-        }
+        if (element) element.classList.add('active');
     };
 
     document.querySelectorAll('.logo-opt').forEach(button => {
         button.addEventListener('click', function() {
-            const socialType = this.getAttribute('data-social');
-            window.setQRLogo(socialType, this);
+            window.setQRLogo(this.getAttribute('data-social'), this);
         });
     });
 
-    // --- 3. ΑΝΕΒΑΣΜΑ CUSTOM LOGO ΑΠΟ ΧΡΗΣΤΗ ---
+    // --- 3. CUSTOM LOGO UPLOAD ---
     const userLogoInput = document.getElementById('user-logo');
     if (userLogoInput) {
         userLogoInput.addEventListener("change", (e) => {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = (event) => {
-                    qrCode.update({ image: event.target.result });
-                };
+                reader.onload = (event) => qrCode.update({ image: event.target.result });
                 reader.readAsDataURL(file);
             }
         });
     }
 
-    // --- 4. INPUT ΔΙΑΧΕΙΡΙΣΗ (URL / TEXT) ---
-    const standardInput = document.getElementById("qr-data");
-    if (standardInput) {
-        standardInput.addEventListener("input", (e) => {
+    // --- 4. DATA INPUT (URL & TEXT FORGE WITH VIEWER) ---
+    const qrInput = document.getElementById("qr-data");
+    if (qrInput) {
+        qrInput.addEventListener("input", (e) => {
             const val = e.target.value.trim();
             
-            // Αν είναι άδειο, βάζουμε ένα default κείμενο για να μην χαλάει το preview
-            const fallback = "QRForge";
-            qrCode.update({ data: val || fallback });
+            // Έλεγχος αν είμαστε στο Text Forge
+            if (window.location.pathname.includes('/text')) {
+                if (val === "") {
+                    qrCode.update({ data: "QRForge" });
+                } else {
+                    // Μετατροπή σε Base64 ασφαλές για URL (Unicode support)
+                    const encoded = btoa(unescape(encodeURIComponent(val)))
+                                    .replace(/\+/g, '-')
+                                    .replace(/\//g, '_')
+                                    .replace(/=+$/, ''); 
+                    
+                    const viewerUrl = window.location.origin + "/view/" + encoded;
+                    qrCode.update({ data: viewerUrl });
+                }
+            } else {
+                // Για URL και Social
+                qrCode.update({ data: val || "https://qrforge-n7ol.onrender.com" });
+            }
         });
     }
 
-    // --- 5. ΡΥΘΜΙΣΕΙΣ ΧΡΩΜΑΤΩΝ ΚΑΙ ΣΤΥΛ ---
-    const dotColorPicker = document.getElementById("dot-color");
-    if (dotColorPicker) {
-        dotColorPicker.addEventListener("input", (e) => {
-            qrCode.update({ dotsOptions: { color: e.target.value } });
-        });
-    }
+    // --- 5. STYLE & COLORS ---
+    document.getElementById("dot-color")?.addEventListener("input", (e) => {
+        qrCode.update({ dotsOptions: { color: e.target.value } });
+    });
 
-    const bgColorPicker = document.getElementById("bg-color-input");
-    if (bgColorPicker) {
-        bgColorPicker.addEventListener("input", (e) => {
-            qrCode.update({ backgroundOptions: { color: e.target.value } });
-        });
-    }
+    document.getElementById("bg-color-input")?.addEventListener("input", (e) => {
+        qrCode.update({ backgroundOptions: { color: e.target.value } });
+    });
 
-    const styleSelector = document.getElementById("dot-style");
-    if (styleSelector) {
-        styleSelector.addEventListener("change", (e) => {
-            qrCode.update({ dotsOptions: { type: e.target.value } });
-        });
-    }
+    document.getElementById("dot-style")?.addEventListener("change", (e) => {
+        qrCode.update({ dotsOptions: { type: e.target.value } });
+    });
 
     // --- 6. DOWNLOAD ---
-    const downloadBtn = document.getElementById("download-btn");
-    if (downloadBtn) {
-        downloadBtn.addEventListener("click", () => {
-            qrCode.download({ name: "qrforge-code", extension: "png" });
-        });
-    }
-});
-const qrInput = document.getElementById("qr-data");
-if (qrInput) {
-    qrInput.addEventListener("input", (e) => {
-        const val = e.target.value.trim();
-        
-        // Ελέγχουμε αν είμαστε στο Text Forge (από το URL της σελίδας)
-        if (window.location.pathname.includes('/text')) {
-            if (val === "") {
-                qrCode.update({ data: "QRForge" });
-            } else {
-                // Μετατρέπουμε το κείμενο σε Base64 για να μπει στο URL
-                const encoded = btoa(unescape(encodeURIComponent(val)));
-                const finalUrl = window.location.origin + "/view/" + encoded;
-                qrCode.update({ data: finalUrl });
-            }
-        } else {
-            // Για URL και Social, δουλεύει όπως πριν
-            qrCode.update({ data: val || "QRForge" });
-        }
+    document.getElementById("download-btn")?.addEventListener("click", () => {
+        qrCode.download({ name: "qrforge-code", extension: "png" });
     });
-}
+});
