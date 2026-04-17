@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const qrElement = document.getElementById("qrcode");
     if (!qrElement) return;
 
-    // 1. Αρχικοποίηση QR Code
+    
     const qrCode = new QRCodeStyling({
         width: 300,
         height: 300,

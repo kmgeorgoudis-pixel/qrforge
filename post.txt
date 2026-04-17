@@ -1,5 +1,5 @@
 git add .
-git commit -m " add txt 6"
+git commit -m " add txt 7"
 git push origin main
 
 
