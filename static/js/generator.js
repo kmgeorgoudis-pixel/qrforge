@@ -119,3 +119,24 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+const qrInput = document.getElementById("qr-data");
+if (qrInput) {
+    qrInput.addEventListener("input", (e) => {
+        const val = e.target.value.trim();
+        
+        // Ελέγχουμε αν είμαστε στο Text Forge (από το URL της σελίδας)
+        if (window.location.pathname.includes('/text')) {
+            if (val === "") {
+                qrCode.update({ data: "QRForge" });
+            } else {
+                // Μετατρέπουμε το κείμενο σε Base64 για να μπει στο URL
+                const encoded = btoa(unescape(encodeURIComponent(val)));
+                const finalUrl = window.location.origin + "/view/" + encoded;
+                qrCode.update({ data: finalUrl });
+            }
+        } else {
+            // Για URL και Social, δουλεύει όπως πριν
+            qrCode.update({ data: val || "QRForge" });
+        }
+    });
+}
