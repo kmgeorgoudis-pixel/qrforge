@@ -13,7 +13,6 @@
         color: #1e293b;
         margin: 0;
         font-family: 'Inter', sans-serif;
-        /* Επιτρέπει το scroll σε όλη τη σελίδα */
         overflow-y: auto !important; 
         min-height: 100vh;
     }
@@ -23,10 +22,10 @@
         grid-template-columns: 1fr 450px;
         gap: 30px;
         max-width: 1200px;
-        margin: 100px auto 100px; /* Περισσότερο περιθώριο κάτω για άνετο scroll */
+        margin: 100px auto 100px;
         padding: 20px;
         align-items: start;
-        height: auto; /* Απελευθέρωση ύψους */
+        height: auto;
     }
 
     .forge-panel.settings {
@@ -34,13 +33,12 @@
         padding: 30px;
         border-radius: 30px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        /* Αφαιρούμε τυχόν εσωτερικά scrollbars που μπλοκάρουν το ποντίκι */
         overflow: visible; 
     }
 
     .forge-panel.preview {
         position: sticky;
-        top: 120px; /* Απόσταση από την κορυφή κατά το scroll */
+        top: 120px;
         background: white;
         padding: 40px;
         border-radius: 30px;
@@ -52,7 +50,6 @@
         z-index: 10;
     }
 
-    /* Styling για τα Inputs */
     .premium-input, select {
         background: #f8fafc !important;
         border: 2px solid #e2e8f0 !important;
@@ -61,6 +58,13 @@
         border-radius: 12px !important;
         width: 100%;
         margin-top: 8px;
+        font-family: inherit;
+    }
+
+    /* Επιπλέον στυλ για το textarea του Text Forge */
+    textarea.premium-input {
+        height: 120px;
+        resize: none;
     }
 
     .section-label {
@@ -102,7 +106,7 @@
             margin-top: 80px; 
         }
         .forge-panel.preview { 
-            position: relative; /* Όχι sticky σε κινητά */
+            position: relative;
             top: 0;
             order: -1; 
             margin-bottom: 20px;
@@ -125,8 +129,13 @@
             <h2 style="margin:0;">Forge <span style="color: #6366f1;">{{ qr_type.upper() }}</span></h2>
             
             <div class="card-inner">
-                <label class="section-label">1. Σύνδεσμος (URL)</label>
-                <input type="text" id="qr-data" class="premium-input" placeholder="https://example.com">
+                {% if qr_type == 'text' %}
+                    <label class="section-label">1. Το μήνυμά σας</label>
+                    <textarea id="qr-data" class="premium-input" placeholder="Πληκτρολογήστε το κείμενο που θέλετε να μετατραπεί σε QR..."></textarea>
+                {% else %}
+                    <label class="section-label">1. Σύνδεσμος (URL)</label>
+                    <input type="text" id="qr-data" class="premium-input" placeholder="https://example.com">
+                {% endif %}
             </div>
 
             {% if qr_type == 'social' %}

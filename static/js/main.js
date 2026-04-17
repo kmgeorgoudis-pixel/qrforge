@@ -1,6 +1,6 @@
-=/**
- * QRForge - Main Logic (Clean Edition)
- * Χωρίς MongoDB - Μόνο URL & Social QR Generation
+/**
+ * QRForge - Main Logic (Stable Edition)
+ * Υποστήριξη: URL, Social & Text Forge 
  */
 
 // 1. Καθολική Αρχικοποίηση QR Code Styling
@@ -8,10 +8,10 @@ const qrCode = new QRCodeStyling({
     width: 300,
     height: 300,
     type: "svg",
-    data: "https://qrforge.gr",
+    data: "QRForge", // Αρχική τιμή
     image: "",
     dotsOptions: {
-        color: "#38bdf8",
+        color: "#6366f1", // Το premium μωβ/μπλε χρώμα σου
         type: "rounded"
     },
     backgroundOptions: {
@@ -31,18 +31,21 @@ document.addEventListener("DOMContentLoaded", () => {
         qrCode.append(qrElement);
     }
 
-    // --- 2. SOCIAL LOGOS ---
+    // --- 2. SOCIAL LOGOS (Με τοπικό TikTok) ---
     window.setQRLogo = function(type, element) {
         const logos = {
             'instagram': 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg',
-            'tiktok': 'https://cdn.pixabay.com/photo/2021/06/15/12/28/tiktok-6338429_1280.png',
+            'tiktok': '/static/img/tiktok.png', // Τοπικό αρχείο για ταχύτητα και αξιοπιστία
             'youtube': 'https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg',
             'whatsapp': 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
             'facebook': 'https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg'
         };
 
         const logoUrl = logos[type] || "";
-        qrCode.update({ image: logoUrl });
+        qrCode.update({ 
+            image: logoUrl,
+            imageOptions: { imageSize: 0.4 }
+        });
 
         // UI Update: Active state για τα κουμπιά
         document.querySelectorAll('.logo-opt').forEach(btn => btn.classList.remove('active'));
@@ -74,12 +77,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- 4. URL INPUT ---
+    // --- 4. DATA INPUT (URL & TEXT FORGE) ---
     const qrInput = document.getElementById("qr-data");
     if (qrInput) {
         qrInput.addEventListener("input", (e) => {
-            // Ενημέρωση QR καθώς γράφει ο χρήστης
-            qrCode.update({ data: e.target.value || "https://qrforge-n7ol.onrender.com/" });
+            const val = e.target.value.trim();
+            // Χρησιμοποιούμε "QRForge" ως fallback για να παραμένει το QR γεμάτο
+            qrCode.update({ data: val || "QRForge" });
         });
     }
 

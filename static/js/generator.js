@@ -1,6 +1,6 @@
 /**
  * QRForge - Generator Logic (Stable Edition)
- * Updated: Local TikTok Logo Support
+ * Updated: Support for Text Forge & Local TikTok Logo
  */
 document.addEventListener("DOMContentLoaded", () => {
     const qrElement = document.getElementById("qrcode");
@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
         width: 300,
         height: 300,
         type: "svg",
-        data: "https://qrforge-n7ol.onrender.com/",
+        data: "QRForge", // Αρχικό κείμενο
         image: "", 
         dotsOptions: {
             color: "#6366f1",
@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
             crossOrigin: "anonymous",
             margin: 5,
             hideBackgroundDots: true,
-            imageSize: 0.4 // Μέγεθος λογοτύπου (0.4 = 40% του QR)
+            imageSize: 0.4 
         }
     });
 
@@ -34,8 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.setQRLogo = function(type, element) {
         const logos = {
             'instagram': 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg',
-            // ΑΛΛΑΓΗ ΕΔΩ: Χρήση τοπικού αρχείου για το TikTok
-            'tiktok': '/static/img/tiktok.png',
+            'tiktok': '/static/img/tiktok.png', // Τοπικό αρχείο
             'youtube': 'https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg',
             'whatsapp': 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
             'facebook': 'https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg'
@@ -43,22 +42,19 @@ document.addEventListener("DOMContentLoaded", () => {
         
         const logoUrl = logos[type] || "";
         
-        // Ενημέρωση του QR με το επιλεγμένο λογότυπο
         qrCode.update({ 
             image: logoUrl,
             imageOptions: {
-                imageSize: 0.4 // Επαναφορά μεγέθους για να είναι σίγουρα σωστό
+                imageSize: 0.4 
             }
         });
 
-        // UI Update: Active state στα εικονίδια
         document.querySelectorAll('.logo-opt').forEach(btn => btn.classList.remove('active'));
         if (element) {
             element.classList.add('active');
         }
     };
 
-    // --- 2.1 ΣΥΝΔΕΣΗ ΤΩΝ CLICKS ΣΤΑ SOCIAL BUTTONS ---
     document.querySelectorAll('.logo-opt').forEach(button => {
         button.addEventListener('click', function() {
             const socialType = this.getAttribute('data-social');
@@ -81,11 +77,15 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- 4. ΑΠΛΟ INPUT (URL / SOCIAL) ---
+    // --- 4. INPUT ΔΙΑΧΕΙΡΙΣΗ (URL / TEXT) ---
     const standardInput = document.getElementById("qr-data");
     if (standardInput) {
         standardInput.addEventListener("input", (e) => {
-            qrCode.update({ data: e.target.value || "https://qrforge-n7ol.onrender.com/" });
+            const val = e.target.value.trim();
+            
+            // Αν είναι άδειο, βάζουμε ένα default κείμενο για να μην χαλάει το preview
+            const fallback = "QRForge";
+            qrCode.update({ data: val || fallback });
         });
     }
 
@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- 6. DOWNLOAD ---
-    const downloadBtn = document.getElementById("download-btn") || document.querySelector(".download-btn");
+    const downloadBtn = document.getElementById("download-btn");
     if (downloadBtn) {
         downloadBtn.addEventListener("click", () => {
             qrCode.download({ name: "qrforge-code", extension: "png" });
