@@ -214,13 +214,144 @@
             .partnership-card { flex-direction: column; text-align: center; }
             .hero h1 { font-size: 2.5rem; }
         }
+        /* --- New Feature Banner CSS --- */
+.new-feature-banner {
+    background: #0f172a; /* Σκούρο φόντο για αντίθεση */
+    color: white;
+    padding: 10px 20px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1100; /* Πάνω από το nav */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.banner-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.new-feature-banner .badge {
+    background: var(--primary-grad);
+    padding: 2px 10px;
+    border-radius: 50px;
+    font-weight: 900;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    animation: pulse 2s infinite;
+}
+
+.new-feature-banner p {
+    margin: 0;
+    font-weight: 400;
+    opacity: 0.9;
+}
+
+.new-feature-banner strong {
+    color: #38bdf8;
+}
+
+.banner-btn {
+    color: white;
+    text-decoration: none;
+    font-weight: 700;
+    background: rgba(255,255,255,0.1);
+    padding: 5px 15px;
+    border-radius: 50px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.banner-btn:hover {
+    background: white;
+    color: #0f172a;
+}
+
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+
+nav {
+    top: 45px !important; 
+}
+
+.hero {
+    padding-top: 180px !important; 
+}
+
+@media (max-width: 768px) {
+    .new-feature-banner p { display: none; } 
+    .new-feature-banner { padding: 8px; }
+    nav { top: 40px !important; }
+}
+/* --- Text Forge Premium Card Style --- */
+.text-forge-card {
+    position: relative;
+    border: 2px solid transparent !important;
+    background: linear-gradient(white, white) padding-box, 
+                var(--primary-grad) border-box !important; /* Gradient περίγραμμα */
+}
+
+.new-badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: var(--primary-grad);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    box-shadow: 0 5px 15px rgba(168, 85, 247, 0.4);
+    animation: bounce 2s infinite;
+}
+
+
+.text-forge-card:hover {
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.3) !important;
+}
+
+.card-glow {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--primary-grad);
+    opacity: 0;
+    transition: opacity 0.4s;
+    z-index: -1;
+    filter: blur(20px);
+}
+
+.text-forge-card:hover .card-glow {
+    opacity: 0.1;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
     </style>
 </head>
 <body>
     <div class="blob"></div>
     <div class="blob" style="right: 0; bottom: 0; animation-delay: -5s;"></div>
     <canvas id="bg-canvas"></canvas>
-
+<div class="new-feature-banner">
+    <div class="banner-content">
+        <span class="badge">NEW</span>
+        <p>Ανακάλυψε το <strong>Text Forge!</strong> Στείλε κρυφά μηνύματα μέσω QR Code.</p>
+        <a href="/forge/text" class="banner-btn">Δοκίμασέ το <i class="fas fa-arrow-right"></i></a>
+    </div>
+</div>
     <nav>
         <a href="/" class="logo">QR<span>FORGE</span></a>
     </nav>
@@ -245,10 +376,12 @@
             <h3>Social Hub</h3>
             <p>Συνδέστε το Instagram, το TikTok και το YouTube σας με ένα μόνο σκανάρισμα.</p>
         </div>
-        <div class="card" onclick="location.href='/forge/text'">
+        <div class="card text-forge-card" onclick="location.href='/forge/text'">
+            <div class="new-badge">NEW</div>
             <i class="fas fa-file-alt"></i>
             <h3>Text Forge</h3>
-            <p>Μετατρέψτε κείμενο ή κρυφά μηνύματα σε QR Code χωρίς ανάγκη για link.</p>
+            <p>Μετατρέψτε κείμενο ή κρυφά μηνύματα σε QR Code!</p>
+            <div class="card-glow"></div>
         </div>
     </main>
 
